@@ -1,173 +1,271 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Ignite LMS • Week 1</title>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <title>Ignite LMS</title>
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <style>[x-cloak]{display:none!important}</style>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rust: {
+              50:'#fbf4f2',100:'#f6e7e0',200:'#eed1c5',300:'#e4b5a3',
+              400:'#d18a71',500:'#be6244',600:'#a74f33',700:'#8d3f2a'
+            }
+          },
+          boxShadow:{card:'0 1px 2px 0 rgb(0 0 0 / 0.05), 0 8px 20px -8px rgb(2 6 23 / 0.1)'},
+          borderRadius:{card:'18px'}
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-neutral-50 text-slate-900" x-data="{ tab: 'dashboard' }">
+
+<body class="bg-white text-slate-800 text-[16px]" x-data="app()">
+
   <!-- SIDEBAR -->
-  <aside class="fixed left-0 top-0 h-screen w-64 bg-white border-r flex flex-col">
-    <div class="p-5 border-b">
-      <div class="text-amber-600 font-extrabold text-xl">Ignite</div>
-      <div class="text-xs text-slate-500">Fall 2025</div>
+  <aside class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200/70">
+    <div class="px-5 pt-6 pb-5 border-b border-slate-200/70">
+      <div class="flex items-center gap-3">
+        <div class="h-10 w-10 rounded-xl bg-rust-100 flex items-center justify-center">
+          <div class="h-2.5 w-2.5 rounded-full bg-rust-600"></div>
+        </div>
+        <div>
+          <div class="text-lg font-semibold text-slate-900">Ignite</div>
+          <div class="text-xs text-slate-500 -mt-0.5">Fall 2025</div>
+        </div>
+      </div>
     </div>
 
-    <nav class="p-2 space-y-1 text-sm flex-1">
-      <template x-for="item in [
-        {k:'dashboard',label:'Dashboard'},
-        {k:'courses',label:'Courses'},
-        {k:'assignments',label:'Assignments'},
-        {k:'quizzes',label:'Quizzes & Tests'},
-        {k:'grades',label:'Grades'},
-        {k:'ai',label:'AI Assistant'}
-      ]" :key="item.k">
+    <nav class="px-3 pt-4 space-y-1">
+      <template x-for="item in navItems" :key="item.k">
         <button
-          class="w-full text-left px-3 py-2 rounded hover:bg-amber-50"
-          :class="tab===item.k && 'bg-amber-100 text-amber-800 font-medium'"
-          @click="tab=item.k"
-          x-text="item.label">
+          class="w-full text-left px-4 py-2 rounded-lg hover:bg-slate-100 transition"
+          :class="tab===item.k ? 'bg-slate-100 font-semibold' : 'text-slate-700'"
+          @click="tab=item.k">
+          <span x-text="item.label"></span>
         </button>
       </template>
     </nav>
 
-    <div class="p-2 border-t text-sm">
-      <button class="w-full text-left px-3 py-2 rounded hover:bg-amber-50"
-              :class="tab==='profile' && 'bg-amber-100 text-amber-800 font-medium'"
-              @click="tab='profile'">Profile</button>
-      <button class="w-full text-left px-3 py-2 rounded hover:bg-amber-50"
-              :class="tab==='settings' && 'bg-amber-100 text-amber-800 font-medium'"
-              @click="tab='settings'">Settings</button>
-      <div class="mt-3 px-3">
-        <div class="font-medium">Abc</div>
-        <div class="text-slate-500 text-xs">sarahj@university.edu</div>
-      </div>
+    <div class="absolute bottom-0 left-0 right-0 border-t border-slate-200/70 px-5 py-4">
+      <div class="text-sm font-medium">Abc</div>
+      <div class="text-xs text-slate-500">sarahj@university.edu</div>
     </div>
   </aside>
 
   <!-- MAIN -->
-  <main class="ml-64 p-8 space-y-8 min-h-screen">
+  <main class="ml-64 min-h-screen">
+    <div class="h-[56px] border-b border-slate-200/70"></div>
 
-    <!-- DASHBOARD -->
-    <section x-show="tab==='dashboard'" x-cloak>
-      <div class="bg-amber-600 text-white rounded-2xl p-6 shadow">
-        <div class="text-xl font-semibold">Welcome back, Sarah! 👋</div>
-        <div class="text-sm opacity-90 mt-1">Believe in yourself and your abilities! ✨</div>
-      </div>
+    <div class="max-w-[1200px] mx-auto px-8 py-8">
 
-      <div class="grid lg:grid-cols-3 gap-6 mt-6">
-        <div class="lg:col-span-2 bg-white border rounded-xl shadow p-5">
-          <div class="font-semibold mb-3">News & Events</div>
-          <div class="space-y-4 text-sm">
-            <div class="flex gap-3 items-start">
-              <img class="h-14 w-20 rounded object-cover" src="https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=400" alt="">
-              <div>
-                <div class="font-medium">New Computer Science Lab Opens on Campus</div>
-                <div class="text-slate-500">Oct 20, 2025 • Cutting-edge workspace for students.</div>
+      <!-- COURSES -->
+      <section x-show="tab==='courses'" x-cloak>
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-[40px] leading-tight font-extrabold tracking-tight text-slate-900">My Courses</h1>
+            <p class="text-slate-600 mt-1">Manage and track your enrolled courses</p>
+          </div>
+          <span class="inline-flex items-center rounded-lg bg-slate-900 text-white px-4 py-2 text-sm">
+            6 Active Courses
+          </span>
+        </div>
+
+        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-7 mt-6">
+          <template x-for="c in courses" :key="c.id">
+            <article class="bg-white rounded-card border border-slate-200/80 shadow-card overflow-hidden">
+              <img :src="c.banner" class="h-56 w-full object-cover" alt="">
+              <div class="p-6">
+                <h3 class="text-[20px] font-semibold text-slate-900" x-text="c.title"></h3>
+                <p class="text-slate-600 mt-1" x-text="c.instructor"></p>
+
+                <!-- modules & students -->
+                <div class="mt-3 flex items-center gap-6 text-sm text-slate-700">
+                  <div class="inline-flex items-center gap-1.5">
+                    <svg class="h-4 w-4 text-slate-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M4 5h14a2 2 0 012 2v11H6a2 2 0 01-2-2V5z"/><path d="M6 18V7a2 2 0 012-2h12"/>
+                    </svg>
+                    <span x-text="c.modules.length + ' modules'"></span>
+                  </div>
+                  <div class="inline-flex items-center gap-1.5">
+                    <svg class="h-4 w-4 text-slate-600" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M16 11a4 4 0 10-8 0 4 4 0 008 0z"/><path d="M3 20a7 7 0 0114 0"/>
+                    </svg>
+                    <span x-text="c.classmates + ' students'"></span>
+                  </div>
+                </div>
+
+                <!-- next class -->
+                <div class="mt-4 rounded-xl bg-slate-50 border border-slate-200/70 p-4">
+                  <div class="text-slate-700 font-medium">Next Class</div>
+                  <div class="text-slate-600 text-sm mt-0.5" x-text="c.nextClass"></div>
+                </div>
+
+                <button
+                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-rust-500 text-white py-2.5 font-medium hover:bg-rust-600 transition"
+                  @click="openCourse(c.id)">
+                  View Course
+                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6"/></svg>
+                </button>
               </div>
-            </div>
-            <div class="flex gap-3 items-start">
-              <img class="h-14 w-20 rounded object-cover" src="https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=400" alt="">
-              <div>
-                <div class="font-medium">Spring 2026 Registration Now Open</div>
-                <div class="text-slate-500">Oct 18, 2025 • Priority registration ends Nov 1.</div>
-              </div>
-            </div>
+            </article>
+          </template>
+        </div>
+      </section>
+
+      <!-- COURSE DETAIL -->
+      <section x-show="tab==='course' && currentCourse" x-cloak>
+        <div class="text-sm">
+          <button class="text-slate-600 hover:text-slate-900 underline underline-offset-2" @click="tab='courses'">
+            Back to Courses
+          </button>
+        </div>
+
+        <h2 class="mt-2 text-[28px] md:text-[34px] font-extrabold tracking-tight text-slate-900" x-text="currentCourse.title"></h2>
+        <div class="text-slate-600" x-text="currentCourse.code"></div>
+
+        <div class="grid md:grid-cols-3 gap-4 mt-6">
+          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
+            <div class="text-slate-500 text-sm">Schedule</div>
+            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.schedule"></div>
+          </div>
+          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
+            <div class="text-slate-500 text-sm">Location</div>
+            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.location"></div>
+          </div>
+          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
+            <div class="text-slate-500 text-sm">Office Hours</div>
+            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.officeHours"></div>
           </div>
         </div>
 
-        <div class="bg-white border rounded-xl shadow p-5">
-          <div class="font-semibold mb-3">Upcoming Deadlines</div>
-          <div class="text-sm text-slate-500">Add a mini calendar widget here later.</div>
-        </div>
-      </div>
-    </section>
+        <div class="mt-7 rounded-xl bg-slate-50 border border-slate-200/80 p-5">
+          <div class="flex items-center justify-between">
+            <h3 class="text-[20px] font-semibold text-slate-900">Course Announcements</h3>
+            <span class="text-xs px-2 py-1 rounded-full bg-slate-900 text-white" x-text="pinnedCount() + ' Pinned'"></span>
+          </div>
 
-    <!-- COURSES -->
-    <section x-show="tab==='courses'" x-cloak>
-      <div class="flex items-center justify-between mb-4">
-        <div>
-          <h1 class="text-2xl font-semibold">My Courses</h1>
-          <p class="text-slate-600 text-sm">Manage and track your enrolled courses.</p>
-        </div>
-        <span class="bg-amber-600 text-white text-xs px-3 py-1 rounded-full">6 Active Courses</span>
-      </div>
-
-      <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-6">
-        <template x-for="c in [
-          {title:'Advanced Web Development', instructor:'Dr. Emily Chen', modules:12, students:45, next:'Oct 21, 10:00 AM', img:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1200'},
-          {title:'Data Structures & Algorithms', instructor:'Prof. Michael Zhang', modules:15, students:60, next:'Oct 22, 2:00 PM', img:'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?q=80&w=1200'},
-          {title:'Linear Algebra', instructor:'Dr. Sarah Johnson', modules:10, students:38, next:'Oct 23, 11:00 AM', img:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200'}
-        ]" :key="c.title">
-          <article class="bg-white rounded-xl border shadow overflow-hidden">
-            <img :src="c.img" class="h-40 w-full object-cover" alt="">
-            <div class="p-4">
-              <div class="font-semibold" x-text="c.title"></div>
-              <div class="text-sm text-slate-600" x-text="c.instructor"></div>
-              <div class="flex justify-between text-xs text-slate-500 mt-2">
-                <span x-text="c.modules + ' modules'"></span>
-                <span x-text="c.students + ' students'"></span>
+          <div class="mt-4 max-h-[360px] overflow-y-auto pr-1">
+            <template x-for="a in currentCourse.announcements" :key="a.id">
+              <div class="mb-3 rounded-lg bg-white border border-slate-200/80 p-4">
+                <div class="flex items-center justify-between">
+                  <div class="font-medium" x-text="a.title"></div>
+                  <span class="text-[11px] px-2 py-0.5 rounded-full"
+                        :class="a.priority==='high' ? 'bg-rose-100 text-rose-700'
+                               : a.priority==='medium' ? 'bg-amber-100 text-amber-800'
+                               : 'bg-slate-100 text-slate-700'"
+                        x-text="a.priority"></span>
+                </div>
+                <p class="mt-1 text-[15px] text-slate-700" x-text="a.body"></p>
+                <div class="mt-2 flex items-center gap-2 text-xs text-slate-500">
+                  <span x-text="a.date"></span><span>•</span><span x-text="a.time"></span>
+                </div>
               </div>
-              <div class="text-xs mt-2"><b>Next Class:</b> <span x-text="c.next"></span></div>
-              <button class="mt-3 w-full py-2 bg-amber-600 text-white rounded hover:bg-amber-700">View Course</button>
-            </div>
-          </article>
-        </template>
-      </div>
-    </section>
+            </template>
+          </div>
+        </div>
 
-    <!-- ASSIGNMENTS -->
-    <section x-show="tab==='assignments'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">Assignments</h1>
-      <div class="bg-white border rounded-xl shadow p-6 text-slate-600 text-sm italic">
-        Upload/list features coming in Week 2.
-      </div>
-    </section>
+        <div class="mt-6">
+          <div class="flex flex-wrap gap-2 text-sm">
+            <template x-for="t in tabs" :key="t">
+              <button class="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
+                      :class="tab2===t ? 'bg-slate-900 text-white border-slate-900' : ''"
+                      @click="tab2=t" x-text="t"></button>
+            </template>
+          </div>
+          <div class="mt-3 rounded-lg bg-white border border-slate-200 p-5 text-slate-700">
+            <template x-if="tab2==='Syllabus'">
+              <ul class="list-disc ml-6 space-y-1">
+                <li>Course overview and grading policy</li>
+                <li>Project milestones &amp; deadlines</li>
+                <li>Reading list &amp; software prerequisites</li>
+              </ul>
+            </template>
+            <template x-if="tab2==='Slides'"><p>Slides (7) — add links here.</p></template>
+            <template x-if="tab2==='Materials'"><p>Materials (6) — PDFs, datasets, starter repos.</p></template>
+            <template x-if="tab2==='Important Dates'"><p>Important dates (10) — midterm &amp; project checkpoints.</p></template>
+            <template x-if="tab2==='Software & Tools'"><p>VS Code, Node, Git, Tailwind, Alpine.js.</p></template>
+            <template x-if="tab2==='Textbooks'"><p>Textbooks (5) — add ISBNs and library links.</p></template>
+          </div>
+        </div>
+      </section>
 
-    <!-- QUIZZES & TESTS -->
-    <section x-show="tab==='quizzes'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">Quizzes & Tests</h1>
-      <div class="bg-white border rounded-xl shadow p-6 text-slate-600 text-sm italic">
-        Quiz generation & delivery will be added in Week 2–3.
-      </div>
-    </section>
+      <!-- PLACEHOLDERS -->
+      <section x-show="tab==='dashboard'" x-cloak>
+        <div class="rounded-xl border border-slate-200 p-6">
+          <div class="text-lg font-semibold">Dashboard</div>
+          <p class="text-slate-600 mt-1">Keep building!</p>
+        </div>
+      </section>
+      <section x-show="tab==='assignments'" x-cloak><h2 class="text-2xl font-semibold">Assignments</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
+      <section x-show="tab==='quizzes'" x-cloak><h2 class="text-2xl font-semibold">Quizzes &amp; Tests</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
+      <section x-show="tab==='grades'" x-cloak><h2 class="text-2xl font-semibold">Grades</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
+      <section x-show="tab==='ai'" x-cloak><h2 class="text-2xl font-semibold">AI Assistant</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Chat &amp; FAQs • Summarize • Generate Quiz • Course Plan.</div></section>
 
-    <!-- GRADES -->
-    <section x-show="tab==='grades'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">Grades</h1>
-      <div class="bg-white border rounded-xl shadow p-6 text-slate-600 text-sm italic">
-        Gradebook summary coming in Week 2.
-      </div>
-    </section>
-
-    <!-- AI ASSISTANT -->
-    <section x-show="tab==='ai'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">AI Teaching Assistant</h1>
-      <div class="bg-white border rounded-xl shadow p-6">
-        <div class="text-slate-600 text-sm mb-3">Tabs coming next: Chat & FAQs • Summarize • Generate Quiz • Course Plan.</div>
-        <div class="text-xs text-slate-500">In Week 3 we’ll optionally wire this to Gemini via API key.</div>
-      </div>
-    </section>
-
-    <!-- PROFILE -->
-    <section x-show="tab==='profile'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">Profile</h1>
-      <div class="bg-white border rounded-xl shadow p-6 text-sm text-slate-600">
-        Name: Sarah Johnson<br>Email: sarahj@university.edu<br>Role: Student
-      </div>
-    </section>
-
-    <!-- SETTINGS -->
-    <section x-show="tab==='settings'" x-cloak>
-      <h1 class="text-2xl font-semibold mb-2">Settings</h1>
-      <div class="bg-white border rounded-xl shadow p-6 text-sm text-slate-600">
-        Placeholder for preferences and (later) AI API key input.
-      </div>
-    </section>
+    </div>
   </main>
+
+  <!-- STATE -->
+  <script>
+    function app(){
+      return {
+        tab:'courses', tab2:'Syllabus',
+        navItems:[
+          {k:'dashboard',label:'Dashboard'},
+          {k:'courses',label:'Courses'},
+          {k:'assignments',label:'Assignments'},
+          {k:'quizzes',label:'Quizzes & Tests'},
+          {k:'grades',label:'Grades'},
+          {k:'ai',label:'AI Assistant'}
+        ],
+        courses:[
+          {
+            id:'cs301',code:'CS 301 • Dr. Emily Chen',
+            title:'Advanced Web Development',instructor:'Dr. Emily Chen',
+            classmates:45,nextClass:'Oct 21, 10:00 AM',
+            banner:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop',
+            schedule:'Mon & Wed 10:00–11:30 AM',location:'Room 301, CS Building',
+            officeHours:'Tue & Thu 2:00–4:00 PM',
+            modules:[{id:'m1'},{id:'m2'}],
+            announcements:[
+              {id:'a1',title:'Welcome to Advanced Web Development!',priority:'high',
+               body:'Please review the syllabus and set up your environment before class.',
+               date:'Sept 1, 2025',time:'9:00 AM',pinned:true},
+              {id:'a2',title:'Project Teams Formation Deadline',priority:'high',
+               body:'Team formation for the final project is due by Sept 20th.',
+               date:'Sept 15, 2025',time:'2:30 PM',pinned:true},
+              {id:'a3',title:'Office Hours Update',priority:'medium',
+               body:'Office hours moved to Wed 3–5 PM this week.',
+               date:'Oct 1, 2025',time:'11:15 AM',pinned:false}
+            ]
+          },
+          {id:'cs201',code:'CS 201 • Prof. Michael Zhang',
+           title:'Data Structures & Algorithms',instructor:'Prof. Michael Zhang',
+           classmates:60,nextClass:'Oct 22, 2:00 PM',
+           banner:'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?q=80&w=1600&auto=format&fit=crop',
+           schedule:'Tue & Thu 2:00–3:30 PM',location:'Room 210, CS Building',
+           officeHours:'Mon 1:00–3:00 PM',modules:[{id:'m1'},{id:'m2'}],announcements:[]},
+          {id:'math101',code:'MATH 101 • Dr. Sarah Johnson',
+           title:'Linear Algebra',instructor:'Dr. Sarah Johnson',
+           classmates:38,nextClass:'Oct 23, 11:00 AM',
+           banner:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1600&auto=format&fit=crop',
+           schedule:'Fri 11:00 AM–1:00 PM',location:'Room 110, Math Building',
+           officeHours:'Wed 3:00–5:00 PM',modules:[{id:'m1'}],announcements:[]}
+        ],
+        currentCourse:null,
+        openCourse(id){this.currentCourse=this.courses.find(c=>c.id===id);this.tab='course';this.tab2='Syllabus';window.scrollTo({top:0,behavior:'smooth'});},
+        pinnedCount(){return(this.currentCourse?.announcements||[]).filter(a=>a.pinned).length;}
+      }
+    }
+  </script>
 </body>
 </html>
