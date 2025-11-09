@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ignite LMS (Week 1 MVP)</title>
+  <!-- Tailwind + Alpine (CDN) -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <style>
+    /* optional: smoother scroll for long pages */
+    html { scroll-behavior: smooth; }
+  </style>
+</head>
+<body x-data="app()" class="bg-neutral-50 text-slate-800">
+  <!-- Sidebar -->
+  <aside class="fixed left-0 top-0 h-full w-64 bg-white border-r">
+    <div class="p-5">
+      <div class="text-amber-600 font-bold text-lg">Ignite • Fall 2025</div>
+    </div>
+    <nav class="px-3 space-y-1">
+      <button class="w-full text-left px-3 py-2 rounded hover:bg-amber-50"
+              :class="route==='courses' && 'bg-amber-100'"
+              @click="route='courses'">Courses</button>
+      <button class="w-full text-left px-3 py-2 rounded hover:bg-amber-50"
+              :class="route==='ai' && 'bg-amber-100'"
+              @click="route='ai'">AI Assistant</button>
+    </nav>
+    <div class="absolute bottom-4 left-0 right-0 px-5 text-sm">
+      <div class="font-medium" x-text="me.name"></div>
+      <div class="text-slate-500" x-text="me.email"></div>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="ml-64 p-8 min-h-screen">
+    <!-- Header / breadcrumbs -->
+    <div class="flex items-center justify-between mb-6">
+      <div class="text-3xl font-semibold" x-text="pageTitle()"></div>
+
+      <!-- Role switcher (visible for grading) -->
+      <div class="text-sm">
+        <label class="mr-2 font-medium">Role:</label>
+        <select class="border rounded px-2 py-1" x-model="me.role" @change="persistUser()">
+          <option>student</option>
+          <option>instructor</option>
+          <option>admin</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- ROUTES -->
+
+    <!-- 1) Courses grid -->
+    <section x-show="route==='courses'">
+      <div class="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <template x-for="c in courses" :key="c.id">
+          <article class="bg-white rounded-xl shadow border overflow-hidden">
+            <img :src="c.banner" alt="" class="h-40 w-full object-cover">
+            <div class="p-4">
+              <div class="flex items-center justify-between">
+                <h3 class="font-semibold text-lg" x-text="c.title"></h3>
+                <span class="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded"
+                      x-text="c.progress + '% Complete'"></span>
+              </div>
+              <p class="text-sm text-slate-500" x-text="c.instructor"></p>
+              <div class="flex items-center justify-between mt-3 text-sm">
+                <span x-text="c.modules.length + ' modules'"></span>
+                <span x-text="c.classmates + ' students'"></span>
+              </div>
+              <div class="text-sm mt-2">
+                <span class="font-medium">Next Class:</span>
+                <span x-text="c.nextClass"></span>
+              </div>
+              <button class="mt-4 w-full py-2 bg-amber-600 text-white rounded hover:bg-amber-700"
+                      @click="openCourse(c.id)">View Course →</button>
+            </div>
+          </article>
+        </template>
+      </div>
+    </section>
+
+    <!-- 2) Course detail (placeholder content for Week 1) -->
+    <section x-show="route==='course' && currentCourse">
+      <button class="text-sm mb-4 underline hover:no-underline" @click="route='courses'">← Back to Courses</button>
+      <h2 class="text-2xl font-semibold" x-text="currentCourse.title"></h2>
+
+      <!-- Header info boxes -->
+      <div class="grid md:grid-cols-3 gap-3 mt-4 text-sm">
+        <div class="p-3 bg-white shadow rounded border">
+          <b>Schedule</b><br><span x-text="currentCourse.schedule"></span>
+        </div>
+        <div class="p-3 bg-white shadow rounded border">
+          <b>Location</b><br><span x-text="currentCourse.location"></span>
+        </div>
+        <div class="p-3 bg-white shadow rounded border">
+          <b>Office Hours</b><br><span x-text="currentCourse.officeHours"></span>
+        </div>
+      </div>
+
+      <!-- Tabs (stub only) -->
+      <div class="mt-6">
+        <div class="flex flex-wrap gap-2 text-sm">
+          <template x-for="t in tabs" :key="t">
+            <button class="px-3 py-1 rounded border"
+                    :class="tab===t ? 'bg-slate-900 text-white' : 'bg-white'"
+                    @click="tab=t" x-text="t"></button>
+          </template>
+        </div>
+        <div class="bg-white border rounded p-6 mt-3 text-sm">
+          <p class="text-slate-600">Week 1 placeholder for <b x-text="tab"></b>.  
+            Next week you’ll load real data here (syllabus list, files, dates, etc.).</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3) AI Assistant (UI only in Week 1) -->
+    <section x-show="route==='ai'">
+      <div class="bg-white border rounded p-4">
+        <p class="text-slate-600 text-sm mb-3">
+          Week 1 UI only. In Week 2 you’ll add offline logic; Week 3 you’ll wire to Gemini (optional).
+        </p>
+        <div class="flex gap-2 text-sm mb-3">
+          <template x-for="t in aiTabs" :key="t">
+            <button class="px-3 py-1 rounded border"
+                    :class="aiTab===t ? 'bg-slate-900 text-white' : 'bg-white'"
+                    @click="aiTab=t" x-text="t"></button>
+          </template>
+        </div>
+        <div class="grid md:grid-cols-3 gap-4">
+          <div class="md:col-span-2 bg-amber-50 border rounded p-4">
+            <p class="text-sm">Selected tab: <b x-text="aiTab"></b></p>
+            <p class="text-sm mt-2">Add components here next week (textarea, buttons, outputs).</p>
+          </div>
+          <div class="bg-white border rounded p-4">
+            <b class="text-sm">Quick FAQs</b>
+            <ul class="list-disc ml-5 text-sm mt-2">
+              <li>How do I submit assignments?</li>
+              <li>When are grades posted?</li>
+              <li>How can I contact my instructor?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- App state + seed data -->
+  <script>
+    function seedIfNeeded(){
+      if(localStorage.getItem('ignite_seeded')) return;
+
+      const courses = [
+        {
+          id:'cs301',
+          title:'Advanced Web Development',
+          instructor:'Dr. Emily Chen',
+          progress:68,
+          classmates:45,
+          nextClass:'Oct 21, 10:00 AM',
+          banner:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop',
+          schedule:'Mon & Wed, 10:00 AM – 11:30 AM',
+          location:'Room 301, CS Building',
+          officeHours:'Tue & Thu, 2:00 PM – 4:00 PM',
+          modules:[{id:'m1'},{id:'m2'}]
+        },
+        {
+          id:'cs201',
+          title:'Data Structures & Algorithms',
+          instructor:'Prof. Michael Zhang',
+          progress:45,
+          classmates:60,
+          nextClass:'Oct 22, 2:00 PM',
+          banner:'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?q=80&w=1600&auto=format&fit=crop',
+          schedule:'Tue & Thu, 2:00 PM – 3:30 PM',
+          location:'Room 210, CS Building',
+          officeHours:'Mon 1:00 PM – 3:00 PM',
+          modules:[{id:'m1'},{id:'m2'},{id:'m3'}]
+        },
+        {
+          id:'math101',
+          title:'Linear Algebra',
+          instructor:'Dr. Sarah Johnson',
+          progress:82,
+          classmates:38,
+          nextClass:'Oct 23, 11:00 AM',
+          banner:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1600&auto=format&fit=crop',
+          schedule:'Fri, 11:00 AM – 1:00 PM',
+          location:'Room 110, Math Building',
+          officeHours:'Wed 3:00 PM – 5:00 PM',
+          modules:[{id:'m1'}]
+        }
+      ];
+      const user = { name:'Abc', email:'sarahj@university.edu', role:'student' };
+
+      localStorage.setItem('ignite_courses', JSON.stringify(courses));
+      localStorage.setItem('ignite_user', JSON.stringify(user));
+      localStorage.setItem('ignite_seeded','1');
+    }
+
+    function app(){
+      seedIfNeeded();
+
+      return {
+        // ---------- state ----------
+        route: 'courses',
+        aiTabs: ['Chat & FAQs','Summarize','Generate Quiz','Course Plan'],
+        aiTab: 'Chat & FAQs',
+        tabs: ['Syllabus','Slides','Materials','Important Dates','Software & Tools','Textbooks'],
+        tab: 'Syllabus',
+
+        me: JSON.parse(localStorage.getItem('ignite_user')||'{}'),
+        courses: JSON.parse(localStorage.getItem('ignite_courses')||'[]'),
+        currentCourse: null,
+
+        // ---------- actions ----------
+        pageTitle(){ return this.route==='courses' ? 'My Courses'
+                         : this.route==='ai' ? 'AI Teaching Assistant'
+                         : (this.currentCourse?.title || 'Course'); },
+        persistUser(){ localStorage.setItem('ignite_user', JSON.stringify(this.me)); },
+        openCourse(id){ this.currentCourse = this.courses.find(c=>c.id===id); this.route='course'; },
+      }
+    }
+  </script>
+</body>
+</html>
