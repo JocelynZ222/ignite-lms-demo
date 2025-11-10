@@ -108,6 +108,7 @@
 
         <!-- DASHBOARD (restored with calendar) -->
         <section x-show="page==='dashboard'" x-cloak>
+          <!-- BRANCH: dashboard-tab -->
           <!-- Welcome banner -->
           <div class="rounded-xl2 bg-rust-500/90 text-white p-6 md:p-7 shadow-card">
             <div class="text-[22px] md:text-[24px] font-semibold">
@@ -215,6 +216,7 @@
 
         <!-- COURSES -->
         <section x-show="page==='courses'" x-cloak>
+          <!-- BRANCH: courses-tab -->
           <div class="flex items-center justify-between">
             <div>
               <h1 class="text-3xl font-bold">My Courses</h1>
@@ -310,9 +312,26 @@
             </template>
           </div>
         </section>
+        <!-- ================= ASSIGNMENTS TAB ================= -->
+        <section x-show="page === 'assignments'">
+          <!-- BRANCH: assignments-tab -->
+          <div class="p-6 text-center text-slate-500">Assignments page (to be built)</div>
+        </section>
 
+        <!-- ================= QUIZZES TAB ================= -->
+        <section x-show="page === 'quizzes'">
+          <!-- BRANCH: quizzes-tab -->
+          <div class="p-6 text-center text-slate-500">Quizzes page (to be built)</div>
+        </section>
+
+        <!-- ================= GRADES TAB ================= -->
+        <section x-show="page === 'grades'">
+          <!-- BRANCH: grades-tab -->
+          <div class="p-6 text-center text-slate-500">Grades page (to be built)</div>
+        </section>
         <!-- AI ASSISTANT -->
         <section x-show="page==='ai'" x-cloak>
+          <!-- BRANCH: ai-assistant-tab -->
           <div class="flex items-center gap-3 mb-6">
             <div class="h-11 w-11 rounded-xl bg-rust-500/90 flex items-center justify-center text-white shadow-card">AI</div>
             <div>
@@ -498,6 +517,7 @@
 
         <!-- PROFILE -->
         <section x-show="page==='profile'" x-cloak>
+          <!-- BRANCH: profile-settings -->
           <h1 class="text-2xl font-bold mb-4">Profile</h1>
           <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 max-w-xl space-y-4">
             <div>
@@ -515,6 +535,7 @@
 
         <!-- SETTINGS -->
         <section x-show="page==='settings'" x-cloak>
+          <!-- BRANCH: settings -->
           <h1 class="text-2xl font-bold mb-4">Settings</h1>
           <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 max-w-xl">
             <div class="text-sm text-slate-600">Additional preferences can go here.</div>
@@ -525,6 +546,38 @@
   </div>
 
   <script>
+    /* ===========================================================
+   IGNITE LMS — DATA MODEL REFERENCE (Student LMS only for now)
+   -----------------------------------------------------------
+   This does NOT change visuals. It just explains data shapes.
+   ===========================================================
+
+   STORAGE KEYS (auto-scoped per role):
+   ignite_student_profile
+   ignite_student_courses
+   ignite_student_assignments
+   ignite_student_submissions
+   ignite_student_grades
+   ignite_student_quizzes
+   ignite_student_ai_summaries
+
+   Shared arrays in app():
+   - news[] → dashboard-tab
+   - courseCards[] → courses-tab
+   - courseDetail{} → courses-tab (detail view)
+   - assignments[] → assignments-tab
+   - grades[] → grades-tab
+   - aiSummaries{} → ai-assistant-tab
+   - profile{} → profile-settings
+
+   Shared helper methods:
+   - listMaterials(courseCode)
+   - addMaterial(courseCode, object)
+   - listAssignments(courseCode)
+   - submitAssignment(assignmentId, fileObj)
+   - generateSummaryFromMaterials(courseCode)
+   =========================================================== */
+
     function app(){
       return {
         /* ===== Role & feature gates (Student-only today) ===== */
