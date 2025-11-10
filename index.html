@@ -517,20 +517,220 @@
 
         <!-- PROFILE -->
         <section x-show="page==='profile'" x-cloak>
-          <!-- BRANCH: profile-settings -->
-          <h1 class="text-2xl font-bold mb-4">Profile</h1>
-          <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 max-w-xl space-y-4">
-            <div>
-              <label class="block text-sm mb-1 text-slate-700">First Name</label>
-              <input x-model="profile.firstName" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" placeholder="First name" />
+            <!-- BRANCH: profile-settings -->
+            <div x-data="profilePage()" x-init="init()" class="space-y-6">
+
+              <!-- Header -->
+              <div class="flex items-center justify-between">
+                <div>
+                  <h1 class="text-3xl font-extrabold text-slate-900">My Profile</h1>
+                  <p class="text-slate-500">Manage your personal information and account settings</p>
+                </div>
+
+                <!-- Edit / Save / Cancel -->
+                <div class="flex gap-3">
+                  <template x-if="!isEditing">
+                    <button @click="startEdit()"
+                            class="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M21.731 2.269a2.625 2.625 0 0 0-3.712 0l-1.157 1.157 3.712 3.712 1.157-1.157a2.625 2.625 0 0 0 0-3.712z"/><path d="M3 17.25V21h3.75L19.81 7.94l-3.712-3.712L3 17.25z"/></svg>
+                      Edit Profile
+                    </button>
+                  </template>
+
+                  <template x-if="isEditing">
+                    <div class="flex gap-3">
+                      <button @click="save()"
+                              class="inline-flex items-center gap-2 rounded-lg bg-amber-600 px-4 py-2 text-white hover:bg-amber-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9 16.17 4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        Save Changes
+                      </button>
+                      <button @click="cancel()"
+                              class="inline-flex items-center gap-2 rounded-lg bg-white px-4 py-2 text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50">
+                        Cancel
+                      </button>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Top summary card -->
+              <div class="rounded-2xl border border-slate-200 bg-white p-6">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+                  <!-- Left: avatar + name -->
+                  <div class="col-span-1 flex items-center gap-5">
+                    <div class="grid h-24 w-24 place-items-center rounded-full bg-amber-700 text-2xl font-bold text-white">
+                      <span x-text="initials(profile.firstName, profile.lastName)"></span>
+                    </div>
+                    <div>
+                      <h2 class="text-xl font-semibold text-slate-900" x-text="fullName"></h2>
+                      <div class="text-slate-500" x-text="profile.major || 'Major'"></div>
+                      <span class="mt-1 inline-block rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-800"
+                            x-text="profile.year || 'Year'"></span>
+                    </div>
+                  </div>
+
+                  <!-- Middle: About Me -->
+                  <div class="col-span-2">
+                    <label class="mb-1 block text-sm font-medium text-slate-700">About Me</label>
+                    <template x-if="!isEditing">
+                      <p class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-slate-700"
+                        x-text="profile.about || 'Tell us about yourself…'"></p>
+                    </template>
+                    <template x-if="isEditing">
+                      <textarea x-model="draft.about" rows="3"
+                                class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"></textarea>
+                    </template>
+                  </div>
+                </div>
+
+                <!-- KPIs -->
+                <div class="mt-6 grid grid-cols-1 gap-4 md:grid-cols-3">
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="text-xs uppercase tracking-wide text-slate-500">GPA</div>
+                    <div class="text-2xl font-semibold text-slate-900" x-text="profile.gpa || '—'"></div>
+                  </div>
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="text-xs uppercase tracking-wide text-slate-500">Student ID</div>
+                    <div class="text-2xl font-semibold text-slate-900" x-text="profile.studentId || '—'"></div>
+                  </div>
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="text-xs uppercase tracking-wide text-slate-500">Enrolled</div>
+                    <div class="text-2xl font-semibold text-slate-900" x-text="profile.enrolledTerm || '—'"></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Two-column details -->
+              <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+                <!-- Personal Information -->
+                <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+                  <div class="mb-1 flex items-center gap-2"><span class="text-amber-600">👤</span><h3 class="text-lg font-semibold text-slate-900">Personal Information</h3></div>
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">First Name</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.firstName"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.firstName" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Last Name</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.lastName"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.lastName" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+
+                    <div class="md:col-span-2">
+                      <label class="mb-1 block text-sm text-slate-600">Email Address</label>
+                      <input x-model="draft.email" disabled class="w-full rounded-lg border-slate-200 bg-slate-50 text-slate-500"/>
+                      <p class="mt-1 text-xs text-slate-500">Email is fixed to the account you registered with.</p>
+                    </div>
+
+                    <div class="md:col-span-2">
+                      <label class="mb-1 block text-sm text-slate-600">Phone Number</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.phone || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.phone" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Academic Information -->
+                <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+                  <div class="mb-1 flex items-center gap-2"><span class="text-amber-600">🎓</span><h3 class="text-lg font-semibold text-slate-900">Academic Information</h3></div>
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Student ID</label>
+                      <input x-model="draft.studentId" disabled class="w-full rounded-lg border-slate-200 bg-slate-50 text-slate-500"/>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Year</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.year || '—'"></p></template>
+                      <template x-if="isEditing">
+                        <select x-model="draft.year" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500">
+                          <option>Freshman</option><option>Sophomore</option><option>Junior</option><option>Senior</option><option>Graduate</option>
+                        </select>
+                      </template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Major</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.major || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.major" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Minor</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.minor || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.minor" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div class="md:col-span-2">
+                      <label class="mb-1 block text-sm text-slate-600">Expected Graduation</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.expectedGrad || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.expectedGrad" placeholder="e.g., Spring 2026" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Address Information -->
+                <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+                  <div class="mb-1 flex items-center gap-2"><span class="text-amber-600">📍</span><h3 class="text-lg font-semibold text-slate-900">Address Information</h3></div>
+                  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+                    <div class="md:col-span-2">
+                      <label class="mb-1 block text-sm text-slate-600">Street Address</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.street || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.street" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">City</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.city || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.city" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">State</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.state || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.state" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">ZIP Code</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.zip || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.zip" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                    <div>
+                      <label class="mb-1 block text-sm text-slate-600">Country</label>
+                      <template x-if="!isEditing"><p class="rounded-lg border border-slate-200 bg-slate-50 p-2.5" x-text="profile.country || '—'"></p></template>
+                      <template x-if="isEditing"><input x-model="draft.country" class="w-full rounded-lg border-slate-300 focus:border-amber-500 focus:ring-amber-500"/></template>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Account Settings -->
+                <div class="space-y-4 rounded-2xl border border-slate-200 bg-white p-6">
+                  <div class="mb-1 flex items-center gap-2"><span class="text-amber-600">🛡️</span><h3 class="text-lg font-semibold text-slate-900">Account Settings</h3></div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm text-slate-600">Email Verified</div>
+                        <div class="text-slate-800">Your email has been verified</div>
+                      </div>
+                      <div class="grid h-7 w-7 place-items-center rounded-full bg-amber-100 text-amber-700">✔</div>
+                    </div>
+                  </div>
+
+                  <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                    <div class="flex items-center justify-between">
+                      <div>
+                        <div class="text-sm text-slate-600">Account Status</div>
+                        <div class="text-slate-800">Active · Good Standing</div>
+                      </div>
+                      <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700">Active</span>
+                    </div>
+                  </div>
+
+                  <div class="space-y-3">
+                    <button class="w-full rounded-lg bg-white px-4 py-2 text-left text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50">Change Password</button>
+                    <button class="w-full rounded-lg bg-white px-4 py-2 text-left text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50">Update Email Preferences</button>
+                    <button class="w-full rounded-lg bg-white px-4 py-2 text-left text-slate-700 ring-1 ring-slate-300 hover:bg-slate-50">Privacy Settings</button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div>
-              <label class="block text-sm mb-1 text-slate-700">Email</label>
-              <input x-model="profile.email" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" placeholder="name@university.edu" />
-            </div>
-            <button class="px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600" @click="saveProfile()">Save</button>
-            <div class="text-xs text-slate-500">Your name & email also update the footer display in the left panel.</div>
-          </div>
+
         </section>
 
         <!-- SETTINGS -->
@@ -783,6 +983,76 @@
           =============================== */
       }
     }
+    function profilePage() {
+      return {
+        isEditing: false,
+        profile: {
+          firstName: 'Sarah',
+          lastName: 'Johnson',
+          email: 'sarah.j@university.edu',
+          phone: '(555) 123-4567',
+          about: 'Computer Science student passionate about web development and AI. Love building innovative solutions and learning new technologies.',
+          gpa: '3.85',
+          studentId: 'STU-2024-001234',
+          enrolledTerm: 'Fall 2022',
+          major: 'Computer Science',
+          minor: 'Mathematics',
+          year: 'Junior',
+          expectedGrad: 'Spring 2025',
+          street: '123 University Ave, Apt 4B',
+          city: 'Boston',
+          state: 'MA',
+          zip: '02115',
+          country: 'United States'
+        },
+        draft: {},
+
+        get fullName() { return `${this.profile.firstName} ${this.profile.lastName}`.trim(); },
+
+        init() {
+          const saved = localStorage.getItem('ignite_profile_v1');
+          if (saved) {
+            try { this.profile = JSON.parse(saved); } catch(e) {}
+          }
+          this.draft = structuredClone(this.profile);
+        },
+
+        persist() {
+          localStorage.setItem('ignite_profile_v1', JSON.stringify(this.profile));
+        },
+
+        startEdit() {
+          this.draft = structuredClone(this.profile);
+          this.isEditing = true;
+        },
+
+        save() {
+          if (!this.draft.firstName || !this.draft.lastName) {
+            alert('Please enter your first and last name.');
+            return;
+          }
+          // lock email & studentId
+          this.draft.email = this.profile.email;
+          this.draft.studentId = this.profile.studentId;
+
+          this.profile = structuredClone(this.draft);
+          this.persist();
+          this.isEditing = false;
+        },
+
+        cancel() {
+          this.draft = structuredClone(this.profile);
+          this.isEditing = false;
+        },
+
+        initials(fn, ln) {
+          const a = (fn || '').trim()[0] || '';
+          const b = (ln || '').trim()[0] || '';
+          return (a + b || 'SJ').toUpperCase();
+        }
+      }
+    }
+
   </script>
 </body>
 </html>
