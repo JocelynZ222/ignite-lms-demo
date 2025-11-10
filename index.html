@@ -527,16 +527,35 @@
   <script>
     function app(){
       return {
+        /* ===== Role & feature gates (Student-only today) ===== */
+        userRole: localStorage.getItem('ignite_role') || 'student',      // 'student' | 'professor'
+        get isStudent(){ return this.userRole === 'student'; },
+        get isProfessor(){ return this.userRole === 'professor'; },
+        setRole(role){                                                    // keep for later when you add a login/role switch
+          this.userRole = role;
+          localStorage.setItem('ignite_role', role);
+          // If you eventually diverge routes per role, you could reset page here.
+          // this.page = this.isStudent ? 'dashboard' : 'prof-dashboard';
+        },
+        features: {                                                       // flip to true as you add professor pages later
+          professorLMS: false
+        },
+        getStoreKey(key){                                                 // keep student/professor data isolated
+          return `ignite_${this.userRole}_${key}`;
+        },
+
+        /* ===== UI state (unchanged visual behavior) ===== */
         sidebarOpen: false,
         page: 'dashboard',
 
-        // ------- Profile (used in footer too) -------
-        profile: JSON.parse(localStorage.getItem('ignite_profile') || '{"firstName":"Sarah","email":"sarahj@university.edu"}'),
+        /* ===== Profile (role-scoped storage) ===== */
+        profile: JSON.parse(localStorage.getItem(`ignite_${(localStorage.getItem('ignite_role')||'student')}_profile`)
+                  || '{"firstName":"Sarah","email":"sarahj@university.edu"}'),
         saveProfile(){
-          localStorage.setItem('ignite_profile', JSON.stringify(this.profile));
+          localStorage.setItem(this.getStoreKey('profile'), JSON.stringify(this.profile));
         },
 
-        // ------- Dashboard: News -------
+        /* ===== Dashboard content (student sample data) ===== */
         news: [
           {id:1, title:'New Computer Science Lab Opens on Campus', tag:'Campus', date:'Oct 20, 2025', img:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=800&auto=format&fit=crop', snippet:'State-of-the-art facility features cutting-edge technology and collaborative workspaces for students.'},
           {id:2, title:'Spring 2026 Registration Now Open', tag:'Academic', date:'Oct 18, 2025', img:'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800&auto=format&fit=crop', snippet:'Students can now register for spring semester courses. Priority registration ends November 1st.'},
@@ -548,49 +567,32 @@
           {id:3,title:'Project Teams Due',when:'Nov 20 • 11:59 PM'}
         ],
 
-        // ------- Calendar state -------
-        cal: (()=>{
-          const d=new Date();
-          return {y:d.getFullYear(), m:d.getMonth()};
-        })(),
+        /* ===== Mini calendar (unchanged) ===== */
+        cal: (()=>{const d=new Date();return {y:d.getFullYear(), m:d.getMonth()};})(),
         get daysMatrix(){
           const {y,m}=this.cal;
           const first=new Date(y,m,1);
-          const startIdx=first.getDay(); // 0-6
+          const startIdx=first.getDay();
           const daysInMonth=new Date(y,m+1,0).getDate();
           const prevDays=new Date(y,m,0).getDate();
-
           const cells=[];
-          // previous month fillers
-          for(let i=startIdx-1;i>=0;i--){
-            cells.push({day:prevDays-i,inMonth:false,date:new Date(y,m-1,prevDays-i)});
-          }
-          // current month
-          for(let d=1; d<=daysInMonth; d++){
-            cells.push({day:d,inMonth:true,date:new Date(y,m,d)});
-          }
-          // next fillers to complete 6 rows
-          while(cells.length%7!==0) {
+          for(let i=startIdx-1;i>=0;i--){ cells.push({day:prevDays-i,inMonth:false,date:new Date(y,m-1,prevDays-i)}); }
+          for(let d=1; d<=daysInMonth; d++){ cells.push({day:d,inMonth:true,date:new Date(y,m,d)}); }
+          while(cells.length%7!==0){
             const d = cells.length - (startIdx + daysInMonth) + 1;
             cells.push({day:d,inMonth:false,date:new Date(y,m+1,d)});
           }
           return cells;
         },
-        monthLabel(){
-          return new Date(this.cal.y,this.cal.m,1).toLocaleString('en', {month:'long', year:'numeric'});
-        },
-        prevMonth(){
-          if(this.cal.m===0){this.cal.m=11;this.cal.y--;} else {this.cal.m--;}
-        },
-        nextMonth(){
-          if(this.cal.m===11){this.cal.m=0;this.cal.y++;} else {this.cal.m++;}
-        },
+        monthLabel(){ return new Date(this.cal.y,this.cal.m,1).toLocaleString('en',{month:'long',year:'numeric'}); },
+        prevMonth(){ if(this.cal.m===0){this.cal.m=11;this.cal.y--;} else {this.cal.m--;} },
+        nextMonth(){ if(this.cal.m===11){this.cal.m=0;this.cal.y++;} else {this.cal.m++;} },
         isToday(d){
           const t=new Date();
           return d.inMonth && d.date.getFullYear()===t.getFullYear() && d.date.getMonth()===t.getMonth() && d.date.getDate()===t.getDate();
         },
 
-        // ------- Courses -------
+        /* ===== Courses (student view data) ===== */
         courseCards: [
           {id:1,title:'Advanced Web Development',instructor:'Dr. Emily Chen',modules:12,students:'45',next:'Oct 21, 10:00 AM',image:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop'},
           {id:2,title:'Data Structures & Algorithms',instructor:'Prof. Michael Zhang',modules:15,students:'60',next:'Oct 22, 2:00 PM',image:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop'},
@@ -608,22 +610,14 @@
             {id:3, title:'Office Hours Update', body:'Office hours moved to Wednesday 3–5 PM due to a faculty meeting. Apologies for any inconvenience.', priority:'medium', date:'Oct 1, 2025', time:'11:15 AM'}
           ]
         },
-        openCourse(id){
-          // you could fetch different detail by id; for now we reuse the same sample detail.
-          this.page='course';
-        },
+        openCourse(id){ this.page='course'; },
 
-        // ------- AI Assistant -------
+        /* ===== AI Assistant (student) ===== */
         aiTab: 'chat',
         faq: [
-          'How do I submit assignments?',
-          'When are grades posted?',
-          'How can I contact my instructor?',
-          'What’s the late submission policy?',
-          'How do I access lecture recordings?'
+          'How do I submit assignments?','When are grades posted?','How can I contact my instructor?',
+          'What’s the late submission policy?','How do I access lecture recordings?'
         ],
-
-        // Chat
         chat: {
           input:'',
           messages:[
@@ -634,16 +628,12 @@
           const text=this.chat.input.trim();
           if(!text) return;
           this.chat.messages.push({id:Date.now(), role:'user', text});
-          // simple canned reply
           this.chat.messages.push({id:Date.now()+1, role:'assistant', text:'Got it! Here’s a quick tip: include your course code (e.g., “CS 301”) for a more targeted answer.'});
           this.chat.input='';
-          this.$nextTick(()=> {
-            const el=document.getElementById('chatScroll');
-            el && (el.scrollTop = el.scrollHeight);
-          });
+          this.$nextTick(()=>{ const el=document.getElementById('chatScroll'); el && (el.scrollTop=el.scrollHeight); });
         },
 
-        // Course+Lectures for Summary/Quiz
+        /* ===== Course + Lectures used by Summary/Quiz (student) ===== */
         courses: [
           {code:'CS 401', lectures:[
             {id:'cs401-1', title:'Introduction to React'},
@@ -662,18 +652,9 @@
             {id:'cs350-2', title:'Sorting & Searching'},
             {id:'cs350-3', title:'Trees & Graphs'},
           ]},
-          {code:'ENG 202', lectures:[
-            {id:'eng202-1', title:'Rhetorical Strategies'},
-            {id:'eng202-2', title:'Synthesis & Argument'},
-          ]},
-          {code:'MATH 201', lectures:[
-            {id:'math201-1', title:'Limits & Continuity'},
-            {id:'math201-2', title:'Derivatives'},
-          ]},
-          {code:'PHYS 201', lectures:[
-            {id:'phys201-1', title:'Kinematics'},
-            {id:'phys201-2', title:'Dynamics'},
-          ]},
+          {code:'ENG 202', lectures:[{id:'eng202-1', title:'Rhetorical Strategies'},{id:'eng202-2', title:'Synthesis & Argument'}]},
+          {code:'MATH 201', lectures:[{id:'math201-1', title:'Limits & Continuity'},{id:'math201-2', title:'Derivatives'}]},
+          {code:'PHYS 201', lectures:[{id:'phys201-1', title:'Kinematics'},{id:'phys201-2', title:'Dynamics'}]},
         ],
         selectedCourse:'CS 401',
         selectedLectures:[],
@@ -696,7 +677,7 @@
           `;
         },
 
-        // Quiz
+        /* ===== Quiz ===== */
         quiz:{course:'CS 401', lectures:[]},
         lecturesByCode(code){
           const c=this.courses.find(x=>x.code===code);
@@ -709,7 +690,6 @@
         },
         quizOut:[],
         generateQuiz(){
-          // simple generator
           this.quizOut = this.quiz.lectures.map((lid,idx)=>({
             q:`What is a key concept from “${(this.lecturesByCode(this.quiz.course).find(l=>l.id===lid)||{}).title || 'Selected Lecture'}”?`,
             options:['Basic principles','Advanced techniques','Practical applications','All of the above'],
@@ -717,7 +697,7 @@
           }));
         },
 
-        // Study Plan
+        /* ===== Study Plan ===== */
         plan:{goals:'', pace:''},
         planOut:[],
         generatePlan(){
@@ -740,6 +720,14 @@
             ]}
           ];
         }
+
+        /* ===============================
+          Professor LMS (future)
+          - When ready, create professor-only pages/components.
+          - Gate them with:  x-show="isProfessor && features.professorLMS"
+          - Store data with this.getStoreKey('something')
+          - Keep student UI untouched.
+          =============================== */
       }
     }
   </script>
