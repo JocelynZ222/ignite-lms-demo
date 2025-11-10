@@ -1,15 +1,15 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" x-data="app()" :class="{'overflow-hidden': sidebarOpen}">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ignite LMS</title>
+
   <!-- Tailwind -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Alpine.js -->
   <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
-  <style>[x-cloak]{display:none!important}</style>
 
   <script>
     tailwind.config = {
@@ -17,253 +17,729 @@
         extend: {
           colors: {
             rust: {
-              50:'#fbf4f2',100:'#f6e7e0',200:'#eed1c5',300:'#e4b5a3',
-              400:'#d18a71',500:'#be6244',600:'#a74f33',700:'#8d3f2a'
+              50:'#fdf4f2',100:'#fde8e4',200:'#f8d3cc',300:'#efb7ad',400:'#e19080',
+              500:'#cf6f5b',600:'#b35146',700:'#8f3c35',800:'#73332f',900:'#5f2d2b'
+            },
+            sand: {
+              50:'#faf7f3',100:'#f4efe9',200:'#ebe2d8',300:'#dfd1c1',400:'#cbb7a1',
+              500:'#b7a089',600:'#9a836c',700:'#7c6957',800:'#645448',900:'#52463c'
             }
           },
-          boxShadow:{card:'0 1px 2px 0 rgb(0 0 0 / 0.05), 0 8px 20px -8px rgb(2 6 23 / 0.1)'},
-          borderRadius:{card:'18px'}
+          boxShadow: {
+            card: '0 1px 2px rgba(15,23,42,.05), 0 12px 24px -8px rgba(15,23,42,.10)'
+          },
+          borderRadius: {
+            xl2: '1.25rem'
+          }
         }
       }
     }
   </script>
+  <style>[x-cloak]{display:none!important}</style>
 </head>
+<body class="bg-sand-50 text-slate-800 selection:bg-rust-200/60">
 
-<body class="bg-white text-slate-800 text-[16px]" x-data="app()">
+  <div class="min-h-dvh flex">
 
-  <!-- SIDEBAR -->
-  <aside class="fixed inset-y-0 left-0 w-64 bg-white border-r border-slate-200/70">
-    <div class="px-5 pt-6 pb-5 border-b border-slate-200/70">
-      <div class="flex items-center gap-3">
-        <div class="h-10 w-10 rounded-xl bg-rust-100 flex items-center justify-center">
-          <div class="h-2.5 w-2.5 rounded-full bg-rust-600"></div>
+    <!-- Sidebar -->
+    <aside
+      class="w-64 bg-white border-r border-sand-200/70 fixed inset-y-0 left-0 z-30 md:static md:translate-x-0 transform transition-transform duration-200"
+      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+      <!-- Brand -->
+      <div class="px-5 pt-6 pb-4 flex items-center gap-3">
+        <div class="h-10 w-10 rounded-full bg-rust-500/90 flex items-center justify-center shadow-card">
+          <span class="text-white font-semibold">I</span>
         </div>
         <div>
-          <div class="text-lg font-semibold text-slate-900">Ignite</div>
-          <div class="text-xs text-slate-500 -mt-0.5">Fall 2025</div>
+          <div class="text-slate-900 font-semibold">Ignite</div>
+          <div class="text-xs text-slate-500">Fall 2025</div>
         </div>
       </div>
-    </div>
 
-    <nav class="px-3 pt-4 space-y-1">
-      <template x-for="item in navItems" :key="item.k">
-        <button
-          class="w-full text-left px-4 py-2 rounded-lg hover:bg-slate-100 transition"
-          :class="tab===item.k ? 'bg-slate-100 font-semibold' : 'text-slate-700'"
-          @click="tab=item.k">
-          <span x-text="item.label"></span>
-        </button>
-      </template>
-    </nav>
+      <!-- Nav -->
+      <nav class="px-3 flex-1 overflow-y-auto">
+        <ul class="space-y-1 text-sm">
+          <li><button @click="page='dashboard'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='dashboard' && 'bg-sand-100 text-slate-900 font-semibold'">Dashboard</button></li>
+          <li><button @click="page='courses'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='courses' && 'bg-sand-100 text-slate-900 font-semibold'">Courses</button></li>
+          <li><button @click="page='assignments'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='assignments' && 'bg-sand-100 text-slate-900 font-semibold'">Assignments</button></li>
+          <li><button @click="page='quizzes'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='quizzes' && 'bg-sand-100 text-slate-900 font-semibold'">Quizzes & Tests</button></li>
+          <li><button @click="page='grades'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='grades' && 'bg-sand-100 text-slate-900 font-semibold'">Grades</button></li>
+          <li><button @click="page='ai'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='ai' && 'bg-sand-100 text-slate-900 font-semibold'">AI Assistant</button></li>
+        </ul>
 
-    <div class="absolute bottom-0 left-0 right-0 border-t border-slate-200/70 px-5 py-4">
-      <div class="text-sm font-medium">Abc</div>
-      <div class="text-xs text-slate-500">sarahj@university.edu</div>
-    </div>
-  </aside>
+        <div class="my-4 border-t border-sand-200/80"></div>
 
-  <!-- MAIN -->
-  <main class="ml-64 min-h-screen">
-    <div class="h-[56px] border-b border-slate-200/70"></div>
+        <ul class="space-y-1 text-sm">
+          <li><button @click="page='profile'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='profile' && 'bg-sand-100 text-slate-900 font-semibold'">Profile</button></li>
+          <li><button @click="page='settings'" class="w-full text-left px-3 py-2 rounded-lg hover:bg-sand-100" :class="page==='settings' && 'bg-sand-100 text-slate-900 font-semibold'">Settings</button></li>
+        </ul>
+      </nav>
 
-    <div class="max-w-[1200px] mx-auto px-8 py-8">
-
-      <!-- COURSES -->
-      <section x-show="tab==='courses'" x-cloak>
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-[40px] leading-tight font-extrabold tracking-tight text-slate-900">My Courses</h1>
-            <p class="text-slate-600 mt-1">Manage and track your enrolled courses</p>
+      <!-- Footer user (bottom) -->
+      <div class="px-5 py-5 text-sm border-t border-sand-200/70">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-full bg-sand-200 flex items-center justify-center text-slate-600 font-semibold">
+            <span x-text="(profile.firstName||'A').slice(0,1)"></span>
           </div>
-          <span class="inline-flex items-center rounded-lg bg-slate-900 text-white px-4 py-2 text-sm">
-            6 Active Courses
-          </span>
         </div>
+        <div class="mt-2">
+          <div class="font-medium" x-text="profile.firstName || 'Student'"></div>
+          <div class="text-xs text-slate-500 truncate max-w-[12rem]" x-text="profile.email || 'student@university.edu'"></div>
+        </div>
+      </div>
+    </aside>
 
-        <div class="grid md:grid-cols-2 xl:grid-cols-3 gap-7 mt-6">
-          <template x-for="c in courses" :key="c.id">
-            <article class="bg-white rounded-card border border-slate-200/80 shadow-card overflow-hidden">
-              <img :src="c.banner" class="h-56 w-full object-cover" alt="">
-              <div class="p-6">
-                <h3 class="text-[20px] font-semibold text-slate-900" x-text="c.title"></h3>
-                <p class="text-slate-600 mt-1" x-text="c.instructor"></p>
+    <!-- Main -->
+    <main class="flex-1 md:ml-0 ml-0 md:relative md:left-0 left-0">
+      <!-- Mobile top bar -->
+      <div class="md:hidden sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-sand-200/70">
+        <div class="px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <button @click="sidebarOpen=!sidebarOpen" class="p-2 rounded-lg hover:bg-sand-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+            </button>
+            <div class="font-semibold">Ignite</div>
+          </div>
+          <div class="text-xs text-slate-500">Fall 2025</div>
+        </div>
+      </div>
 
-                <!-- modules & students -->
-                <div class="mt-3 flex items-center gap-6 text-sm text-slate-700">
-                  <div class="inline-flex items-center gap-1.5">
-                    <svg class="h-4 w-4 text-slate-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M4 5h14a2 2 0 012 2v11H6a2 2 0 01-2-2V5z"/><path d="M6 18V7a2 2 0 012-2h12"/>
-                    </svg>
-                    <span x-text="c.modules.length + ' modules'"></span>
-                  </div>
-                  <div class="inline-flex items-center gap-1.5">
-                    <svg class="h-4 w-4 text-slate-600" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M16 11a4 4 0 10-8 0 4 4 0 008 0z"/><path d="M3 20a7 7 0 0114 0"/>
-                    </svg>
-                    <span x-text="c.classmates + ' students'"></span>
-                  </div>
-                </div>
+      <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-8">
 
-                <!-- next class -->
-                <div class="mt-4 rounded-xl bg-slate-50 border border-slate-200/70 p-4">
-                  <div class="text-slate-700 font-medium">Next Class</div>
-                  <div class="text-slate-600 text-sm mt-0.5" x-text="c.nextClass"></div>
-                </div>
+        <!-- DASHBOARD (restored with calendar) -->
+        <section x-show="page==='dashboard'" x-cloak>
+          <!-- Welcome banner -->
+          <div class="rounded-xl2 bg-rust-500/90 text-white p-6 md:p-7 shadow-card">
+            <div class="text-[22px] md:text-[24px] font-semibold">
+              Welcome back, <span x-text="profile.firstName || 'Sarah'"></span>! 👋
+            </div>
+            <div class="mt-2 flex items-start gap-2 text-white/95">
+              <svg class="h-5 w-5 mt-0.5" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l1.546 4.758L18 8l-4.454 1.242L12 14l-1.546-4.758L6 8l4.454-1.242L12 2z"/></svg>
+              <span>Every small step counts towards your success!</span>
+              <span class="ml-1">✨</span>
+            </div>
+          </div>
 
-                <button
-                  class="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-lg bg-rust-500 text-white py-2.5 font-medium hover:bg-rust-600 transition"
-                  @click="openCourse(c.id)">
-                  View Course
-                  <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6"/></svg>
-                </button>
+          <div class="grid lg:grid-cols-3 gap-6 mt-6">
+            <!-- News & Events -->
+            <div class="lg:col-span-2 rounded-xl2 bg-white border border-sand-200/80 shadow-card">
+              <div class="px-5 py-4 border-b border-sand-200/70 flex items-center gap-2">
+                <svg class="h-4 w-4 text-slate-600" viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h16v2H4zm0 5h10v2H4zm0 5h16v2H4z"/></svg>
+                <div class="font-semibold text-slate-800">News &amp; Events</div>
               </div>
-            </article>
-          </template>
-        </div>
-      </section>
 
-      <!-- COURSE DETAIL -->
-      <section x-show="tab==='course' && currentCourse" x-cloak>
-        <div class="text-sm">
-          <button class="text-slate-600 hover:text-slate-900 underline underline-offset-2" @click="tab='courses'">
-            Back to Courses
-          </button>
-        </div>
+              <div class="px-5 pt-3">
+                <div class="inline-flex rounded-xl bg-slate-100 p-1 text-sm">
+                  <span class="px-3 py-1 rounded-lg bg-white border border-sand-200 text-slate-800 font-medium">Latest News</span>
+                  <span class="px-3 py-1 text-slate-500">Upcoming Events</span>
+                </div>
+              </div>
 
-        <h2 class="mt-2 text-[28px] md:text-[34px] font-extrabold tracking-tight text-slate-900" x-text="currentCourse.title"></h2>
-        <div class="text-slate-600" x-text="currentCourse.code"></div>
+              <div class="p-5 space-y-4">
+                <template x-for="n in news" :key="n.id">
+                  <div class="rounded-xl border border-sand-200/80 bg-white p-4 flex gap-4 items-start">
+                    <img :src="n.img" class="h-16 w-24 rounded-lg object-cover" alt="">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-3">
+                        <a class="font-medium text-slate-800 hover:underline" href="#" x-text="n.title"></a>
+                        <span class="ml-auto text-xs rounded-full px-2 py-0.5"
+                              :class="n.tag==='Campus'?'bg-amber-100 text-amber-800'
+                                     : n.tag==='Academic' ? 'bg-emerald-100 text-emerald-800'
+                                     : 'bg-slate-100 text-slate-700'"
+                              x-text="n.tag"></span>
+                      </div>
+                      <p class="text-slate-600 text-[15px] mt-1" x-text="n.snippet"></p>
+                      <div class="text-xs text-slate-500 mt-2 flex items-center gap-1">
+                        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M7 11h10v2H7z"/><path d="M19 4H5a2 2 0 00-2 2v12a2 2 0 002 2h14a2 2 0 002-2V6a2 2 0 00-2-2zm0 14H5V8h14z"/></svg>
+                        <span x-text="n.date"></span>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
 
-        <div class="grid md:grid-cols-3 gap-4 mt-6">
-          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
-            <div class="text-slate-500 text-sm">Schedule</div>
-            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.schedule"></div>
+            <!-- Right column -->
+            <div class="space-y-6">
+              <!-- Calendar / Upcoming deadlines -->
+              <div class="rounded-xl2 bg-slate-50 border border-sand-200/80 shadow-card">
+                <div class="px-5 py-4 border-b border-sand-200/70 font-semibold text-slate-800">Upcoming Deadlines</div>
+
+                <!-- Calendar header -->
+                <div class="px-5 pt-3 flex items-center justify-between">
+                  <button class="p-1.5 rounded-lg hover:bg-slate-200/60" @click="prevMonth()">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M15 18l-6-6 6-6"/></svg>
+                  </button>
+                  <div class="font-medium text-slate-700" x-text="monthLabel()"></div>
+                  <button class="p-1.5 rounded-lg hover:bg-slate-200/60" @click="nextMonth()">
+                    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="currentColor"><path d="M9 6l6 6-6 6"/></svg>
+                  </button>
+                </div>
+
+                <!-- Weekdays -->
+                <div class="px-5 mt-3 grid grid-cols-7 text-center text-xs text-slate-500">
+                  <span>Su</span><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span>
+                </div>
+
+                <!-- Days grid -->
+                <div class="px-5 pb-5 mt-2 grid grid-cols-7 gap-y-1 text-center">
+                  <template x-for="(d,idx) in daysMatrix" :key="idx">
+                    <div class="py-2">
+                      <div class="mx-auto h-8 w-8 flex items-center justify-center rounded-full text-sm"
+                          :class="d.inMonth ? (isToday(d) ? 'bg-slate-900 text-white' : 'text-slate-800 hover:bg-slate-200/60') : 'text-slate-400'">
+                        <span x-text="d.day"></span>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Important dates -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card">
+                <div class="px-5 py-4 border-b border-sand-200/70 font-semibold text-slate-800">Important Dates</div>
+                <div class="p-5 space-y-3 text-sm">
+                  <template x-for="i in important" :key="i.id">
+                    <div class="flex items-start gap-2">
+                      <span class="mt-0.5 h-2 w-2 rounded-full bg-slate-700"></span>
+                      <div>
+                        <div class="font-medium text-slate-800" x-text="i.title"></div>
+                        <div class="text-slate-500" x-text="i.when"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
-            <div class="text-slate-500 text-sm">Location</div>
-            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.location"></div>
-          </div>
-          <div class="rounded-xl bg-white border border-slate-200/80 p-4">
-            <div class="text-slate-500 text-sm">Office Hours</div>
-            <div class="mt-1 font-medium text-slate-800" x-text="currentCourse.officeHours"></div>
-          </div>
-        </div>
+        </section>
 
-        <div class="mt-7 rounded-xl bg-slate-50 border border-slate-200/80 p-5">
+        <!-- COURSES -->
+        <section x-show="page==='courses'" x-cloak>
           <div class="flex items-center justify-between">
-            <h3 class="text-[20px] font-semibold text-slate-900">Course Announcements</h3>
-            <span class="text-xs px-2 py-1 rounded-full bg-slate-900 text-white" x-text="pinnedCount() + ' Pinned'"></span>
+            <div>
+              <h1 class="text-3xl font-bold">My Courses</h1>
+              <p class="text-slate-600 mt-1">Manage and track your enrolled courses</p>
+            </div>
+            <div class="px-3 py-1.5 rounded-full bg-sand-200 text-xs text-slate-700">6 Active Courses</div>
           </div>
 
-          <div class="mt-4 max-h-[360px] overflow-y-auto pr-1">
-            <template x-for="a in currentCourse.announcements" :key="a.id">
-              <div class="mb-3 rounded-lg bg-white border border-slate-200/80 p-4">
-                <div class="flex items-center justify-between">
-                  <div class="font-medium" x-text="a.title"></div>
-                  <span class="text-[11px] px-2 py-0.5 rounded-full"
-                        :class="a.priority==='high' ? 'bg-rose-100 text-rose-700'
-                               : a.priority==='medium' ? 'bg-amber-100 text-amber-800'
-                               : 'bg-slate-100 text-slate-700'"
-                        x-text="a.priority"></span>
+          <div class="grid lg:grid-cols-3 gap-6 mt-6">
+            <template x-for="c in courseCards" :key="c.id">
+              <div class="bg-white rounded-xl2 border border-sand-200/70 shadow-card overflow-hidden flex flex-col">
+                <div class="h-48 w-full">
+                  <img :src="c.image" alt="" class="h-full w-full object-cover">
                 </div>
-                <p class="mt-1 text-[15px] text-slate-700" x-text="a.body"></p>
-                <div class="mt-2 flex items-center gap-2 text-xs text-slate-500">
-                  <span x-text="a.date"></span><span>•</span><span x-text="a.time"></span>
+                <div class="p-5 flex-1 flex flex-col">
+                  <div class="font-semibold" x-text="c.title"></div>
+                  <div class="text-sm text-slate-600" x-text="c.instructor"></div>
+
+                  <div class="mt-3 flex items-center gap-5 text-xs text-slate-600">
+                    <div class="flex items-center gap-1">
+                      <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span>
+                      <span x-text="c.modules + ' modules'"></span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                      <span class="inline-block w-2 h-2 rounded-full bg-slate-400"></span>
+                      <span x-text="c.students"></span>
+                    </div>
+                  </div>
+
+                  <div class="mt-3 text-xs">
+                    <div class="text-slate-500">Next Class</div>
+                    <div class="text-slate-700" x-text="c.next"></div>
+                  </div>
+
+                  <button
+                    class="mt-4 w-full px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600"
+                    @click="openCourse(c.id)">
+                    View Course
+                  </button>
                 </div>
               </div>
             </template>
           </div>
-        </div>
+        </section>
 
-        <div class="mt-6">
-          <div class="flex flex-wrap gap-2 text-sm">
-            <template x-for="t in tabs" :key="t">
-              <button class="px-3 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50"
-                      :class="tab2===t ? 'bg-slate-900 text-white border-slate-900' : ''"
-                      @click="tab2=t" x-text="t"></button>
+        <!-- COURSE DETAIL -->
+        <section x-show="page==='course'" x-cloak>
+          <button class="text-sm text-slate-600 hover:underline mb-3" @click="page='courses'">← Back to Courses</button>
+
+          <h1 class="text-3xl font-bold" x-text="courseDetail.title"></h1>
+          <div class="text-slate-600" x-text="courseDetail.code + ' • ' + courseDetail.instructorName"></div>
+
+          <div class="grid lg:grid-cols-3 gap-4 mt-5">
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+              <div class="text-sm text-slate-500">Schedule</div>
+              <div class="font-medium" x-text="courseDetail.schedule"></div>
+            </div>
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+              <div class="text-sm text-slate-500">Location</div>
+              <div class="font-medium" x-text="courseDetail.location"></div>
+            </div>
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+              <div class="text-sm text-slate-500">Office Hours</div>
+              <div class="font-medium" x-text="courseDetail.officeHours"></div>
+            </div>
+          </div>
+
+          <div class="mt-6 rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="font-semibold">Course Announcements</div>
+              <div class="text-xs text-slate-500" x-text="courseDetail.pinned.length + ' Pinned'"></div>
+            </div>
+
+            <div class="max-h-[420px] overflow-y-auto pr-1 space-y-3">
+              <template x-for="a in courseDetail.announcements" :key="a.id">
+                <div class="rounded-lg border border-sand-200 p-4 bg-white">
+                  <div class="flex items-start justify-between">
+                    <div class="font-medium" x-text="a.title"></div>
+                    <span class="text-[10px] px-2 py-0.5 rounded-full border"
+                          :class="a.priority==='high' ? 'text-rose-700 border-rose-300 bg-rose-50' : 'text-sand-700 border-sand-300 bg-sand-50' "
+                          x-text="a.priority"></span>
+                  </div>
+                  <div class="text-sm text-slate-700 mt-1" x-text="a.body"></div>
+                  <div class="mt-2 text-xs text-slate-500" x-text="a.date + ' · ' + a.time"></div>
+                </div>
+              </template>
+            </div>
+          </div>
+
+          <div class="mt-4 flex flex-wrap gap-2">
+            <template x-for="tab in ['Syllabus','Slides (7)','Materials (6)','Important Dates (10)','Software & Tools (8)','Textbooks (5)']" :key="tab">
+              <span class="px-3 py-2 text-sm rounded-full border border-sand-300 bg-white shadow-sm cursor-default" x-text="tab"></span>
             </template>
           </div>
-          <div class="mt-3 rounded-lg bg-white border border-slate-200 p-5 text-slate-700">
-            <template x-if="tab2==='Syllabus'">
-              <ul class="list-disc ml-6 space-y-1">
-                <li>Course overview and grading policy</li>
-                <li>Project milestones &amp; deadlines</li>
-                <li>Reading list &amp; software prerequisites</li>
-              </ul>
-            </template>
-            <template x-if="tab2==='Slides'"><p>Slides (7) — add links here.</p></template>
-            <template x-if="tab2==='Materials'"><p>Materials (6) — PDFs, datasets, starter repos.</p></template>
-            <template x-if="tab2==='Important Dates'"><p>Important dates (10) — midterm &amp; project checkpoints.</p></template>
-            <template x-if="tab2==='Software & Tools'"><p>VS Code, Node, Git, Tailwind, Alpine.js.</p></template>
-            <template x-if="tab2==='Textbooks'"><p>Textbooks (5) — add ISBNs and library links.</p></template>
+        </section>
+
+        <!-- AI ASSISTANT -->
+        <section x-show="page==='ai'" x-cloak>
+          <div class="flex items-center gap-3 mb-6">
+            <div class="h-11 w-11 rounded-xl bg-rust-500/90 flex items-center justify-center text-white shadow-card">AI</div>
+            <div>
+              <h1 class="text-2xl font-bold">AI Teaching Assistant</h1>
+              <div class="text-sm text-slate-600">Your personal AI helper for learning, studying, and academic success</div>
+            </div>
           </div>
-        </div>
-      </section>
 
-      <!-- PLACEHOLDERS -->
-      <section x-show="tab==='dashboard'" x-cloak>
-        <div class="rounded-xl border border-slate-200 p-6">
-          <div class="text-lg font-semibold">Dashboard</div>
-          <p class="text-slate-600 mt-1">Keep building!</p>
-        </div>
-      </section>
-      <section x-show="tab==='assignments'" x-cloak><h2 class="text-2xl font-semibold">Assignments</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
-      <section x-show="tab==='quizzes'" x-cloak><h2 class="text-2xl font-semibold">Quizzes &amp; Tests</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
-      <section x-show="tab==='grades'" x-cloak><h2 class="text-2xl font-semibold">Grades</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Coming soon.</div></section>
-      <section x-show="tab==='ai'" x-cloak><h2 class="text-2xl font-semibold">AI Assistant</h2><div class="mt-3 rounded-xl bg-white border border-slate-200 p-6 text-slate-600">Chat &amp; FAQs • Summarize • Generate Quiz • Course Plan.</div></section>
+          <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card mb-5">
+            <div class="px-5 py-3 text-sm">
+              <span class="font-medium">AI-Powered Learning Support</span>
+              <span class="text-slate-600"> — Get instant help with questions, lecture summaries, quizzes, and personalized study plans.</span>
+            </div>
+          </div>
 
-    </div>
-  </main>
+          <div class="flex gap-3 overflow-x-auto pb-2 mb-4">
+            <button @click="aiTab='chat'" class="px-4 py-2 rounded-full border text-sm" :class="aiTab==='chat' ? 'bg-sand-100 border-sand-300 font-semibold' : 'bg-white border-sand-200 hover:bg-sand-50'">Chat & FAQs</button>
+            <button @click="aiTab='summary'" class="px-4 py-2 rounded-full border text-sm" :class="aiTab==='summary' ? 'bg-sand-100 border-sand-300 font-semibold' : 'bg-white border-sand-200 hover:bg-sand-50'">Summarize</button>
+            <button @click="aiTab='quiz'" class="px-4 py-2 rounded-full border text-sm" :class="aiTab==='quiz' ? 'bg-sand-100 border-sand-300 font-semibold' : 'bg-white border-sand-200 hover:bg-sand-50'">Generate Quiz</button>
+            <button @click="aiTab='plan'" class="px-4 py-2 rounded-full border text-sm" :class="aiTab==='plan' ? 'bg-sand-100 border-sand-300 font-semibold' : 'bg-white border-sand-200 hover:bg-sand-50'">Course Plan</button>
+          </div>
 
-  <!-- STATE -->
+          <!-- Chat -->
+          <div x-show="aiTab==='chat'" x-cloak class="grid lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+              <div class="h-[420px] overflow-y-auto space-y-3 pr-1" id="chatScroll">
+                <template x-for="m in chat.messages" :key="m.id">
+                  <div :class="m.role==='user' ? 'text-right' : 'text-left'">
+                    <div class="inline-block rounded-2xl px-4 py-2 text-sm" :class="m.role==='user' ? 'bg-rust-500/90 text-white' : 'bg-sand-100 text-slate-800'">
+                      <span x-text="m.text"></span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+              <div class="mt-4 flex gap-2">
+                <input x-model="chat.input" @keydown.enter.prevent="sendChat()" class="flex-1 rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" placeholder="Ask a question…" />
+                <button @click="sendChat()" class="px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600">Send</button>
+              </div>
+            </div>
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-4">
+              <div class="font-semibold mb-3">Quick FAQs</div>
+              <div class="space-y-2 text-sm">
+                <template x-for="q in faq" :key="q">
+                  <button @click="chat.input=q; sendChat()" class="w-full text-left px-3 py-2 rounded-lg border border-sand-200 hover:bg-sand-50">
+                    <span x-text="q"></span>
+                  </button>
+                </template>
+              </div>
+              <div class="mt-5 text-xs text-slate-500">Pro tip: include course codes (e.g., “CS 301”) for better answers.</div>
+            </div>
+          </div>
+
+          <!-- Summary -->
+          <div x-show="aiTab==='summary'" x-cloak class="grid lg:grid-cols-2 gap-6">
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Select Lectures to Summarize</div>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <template x-for="c in courses" :key="c.code">
+                  <button class="px-3 py-2 rounded-lg border" :class="selectedCourse===c.code ? 'border-rust-500 bg-sand-100 font-semibold' : 'border-sand-300 hover:bg-sand-50'" @click="selectedCourse=c.code; selectedLectures=[]">
+                    <span x-text="c.code"></span>
+                  </button>
+                </template>
+              </div>
+
+              <div class="mt-4">
+                <div class="text-xs uppercase tracking-wide text-slate-500 mb-2">Lectures</div>
+                <template x-if="currentLectures().length===0">
+                  <div class="text-sm text-slate-500">Pick a course to see its lectures.</div>
+                </template>
+                <div class="space-y-2">
+                  <template x-for="l in currentLectures()" :key="l.id">
+                    <label class="flex items-center gap-2 text-sm px-3 py-2 rounded-lg border cursor-pointer" :class="selectedLectures.includes(l.id)?'border-rust-500 bg-sand-100':'border-sand-300 hover:bg-sand-50'">
+                      <input type="checkbox" class="accent-rust-500" :value="l.id" @change="toggleLecture(l.id)" :checked="selectedLectures.includes(l.id)">
+                      <span x-text="l.title"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+
+              <button @click="generateSummary()" class="mt-4 w-full px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600 disabled:opacity-50" :disabled="selectedLectures.length===0">Generate Summary</button>
+            </div>
+
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Generated Summary</div>
+              <template x-if="!summary.html"><div class="text-slate-500 text-sm">Select a course and lectures, then click “Generate Summary”.</div></template>
+              <div class="prose prose-sm max-w-none" x-html="summary.html"></div>
+            </div>
+          </div>
+
+          <!-- Quiz -->
+          <div x-show="aiTab==='quiz'" x-cloak class="grid lg:grid-cols-2 gap-6">
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Configure Quiz Generation</div>
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <template x-for="c in courses" :key="c.code">
+                  <button class="px-3 py-2 rounded-lg border" :class="quiz.course===c.code ? 'border-rust-500 bg-sand-100 font-semibold' : 'border-sand-300 hover:bg-sand-50'" @click="quiz.course=c.code; quiz.lectures=[]">
+                    <span x-text="c.code"></span>
+                  </button>
+                </template>
+              </div>
+
+              <div class="mt-4">
+                <div class="text-xs uppercase tracking-wide text-slate-500 mb-2">Lectures</div>
+                <div class="space-y-2">
+                  <template x-for="l in lecturesByCode(quiz.course)" :key="l.id">
+                    <label class="flex items-center gap-2 text-sm px-3 py-2 rounded-lg border cursor-pointer" :class="quiz.lectures.includes(l.id)?'border-rust-500 bg-sand-100':'border-sand-300 hover:bg-sand-50'">
+                      <input type="checkbox" class="accent-rust-500" :value="l.id" @change="toggleQuizLecture(l.id)" :checked="quiz.lectures.includes(l.id)">
+                      <span x-text="l.title"></span>
+                    </label>
+                  </template>
+                </div>
+              </div>
+
+              <button @click="generateQuiz()" class="mt-4 w-full px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600 disabled:opacity-50" :disabled="quiz.lectures.length===0">Generate Quiz</button>
+            </div>
+
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Generated Quiz</div>
+              <template x-if="quizOut.length===0">
+                <div class="text-slate-500 text-sm">Select a course and lectures, then click “Generate Quiz”.</div>
+              </template>
+              <div class="space-y-4">
+                <template x-for="(q,idx) in quizOut" :key="idx">
+                  <div class="rounded-lg border border-sand-200 p-4">
+                    <div class="text-sm font-medium mb-2" x-text="'Q' + (idx+1) + '. ' + q.q"></div>
+                    <div class="space-y-1 text-sm">
+                      <template x-for="(opt,i) in q.options" :key="i">
+                        <label class="flex items-center gap-2">
+                          <input type="radio" :name="'q'+idx" class="accent-rust-500">
+                          <span x-text="opt"></span>
+                        </label>
+                      </template>
+                    </div>
+                    <details class="mt-2 text-xs">
+                      <summary class="cursor-pointer text-slate-600">Show answer</summary>
+                      <div class="mt-1"><span class="font-medium">Answer:</span> <span x-text="q.answer"></span></div>
+                    </details>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <!-- Course Plan -->
+          <div x-show="aiTab==='plan'" x-cloak class="grid lg:grid-cols-2 gap-6">
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Create Personalized Study Plan</div>
+
+              <label class="block text-sm mb-1 text-slate-700">Your Learning Goals</label>
+              <textarea x-model="plan.goals" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" rows="4" placeholder="E.g., Master data structures, improve web development skills, prepare for midterms..."></textarea>
+
+              <label class="block text-sm mt-4 mb-1 text-slate-700">Study Pace & Preferences</label>
+              <textarea x-model="plan.pace" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" rows="3" placeholder="E.g., I have 15 hours per week, prefer morning study sessions, need to focus more on CS courses..."></textarea>
+
+              <div class="mt-4 text-xs rounded-lg border border-sand-200 p-3 bg-sand-50">
+                <div class="font-medium mb-1">Performance-Based Recommendations</div>
+                Your study plan will be optimized based on your current grades and course progress.
+              </div>
+
+              <button @click="generatePlan()" class="mt-4 w-full px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600">Generate Study Plan</button>
+            </div>
+
+            <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5">
+              <div class="font-semibold mb-3">Your Personalized Plan</div>
+              <template x-if="planOut.length===0">
+                <div class="text-slate-500 text-sm">Enter your learning goals and study preferences to generate a personalized plan tailored to your needs.</div>
+              </template>
+              <div class="space-y-3">
+                <template x-for="(p, i) in planOut" :key="i">
+                  <div class="rounded-lg border border-sand-200 p-3">
+                    <div class="font-medium text-sm" x-text="p.title"></div>
+                    <ul class="mt-1 text-sm list-disc list-inside text-slate-700">
+                      <template x-for="step in p.steps" :key="step">
+                        <li x-text="step"></li>
+                      </template>
+                    </ul>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- PROFILE -->
+        <section x-show="page==='profile'" x-cloak>
+          <h1 class="text-2xl font-bold mb-4">Profile</h1>
+          <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 max-w-xl space-y-4">
+            <div>
+              <label class="block text-sm mb-1 text-slate-700">First Name</label>
+              <input x-model="profile.firstName" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" placeholder="First name" />
+            </div>
+            <div>
+              <label class="block text-sm mb-1 text-slate-700">Email</label>
+              <input x-model="profile.email" class="w-full rounded-lg border border-sand-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-rust-300" placeholder="name@university.edu" />
+            </div>
+            <button class="px-4 py-2 rounded-lg bg-rust-500/90 text-white text-sm hover:bg-rust-600" @click="saveProfile()">Save</button>
+            <div class="text-xs text-slate-500">Your name & email also update the footer display in the left panel.</div>
+          </div>
+        </section>
+
+        <!-- SETTINGS -->
+        <section x-show="page==='settings'" x-cloak>
+          <h1 class="text-2xl font-bold mb-4">Settings</h1>
+          <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 max-w-xl">
+            <div class="text-sm text-slate-600">Additional preferences can go here.</div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
   <script>
     function app(){
       return {
-        tab:'courses', tab2:'Syllabus',
-        navItems:[
-          {k:'dashboard',label:'Dashboard'},
-          {k:'courses',label:'Courses'},
-          {k:'assignments',label:'Assignments'},
-          {k:'quizzes',label:'Quizzes & Tests'},
-          {k:'grades',label:'Grades'},
-          {k:'ai',label:'AI Assistant'}
+        sidebarOpen: false,
+        page: 'dashboard',
+
+        // ------- Profile (used in footer too) -------
+        profile: JSON.parse(localStorage.getItem('ignite_profile') || '{"firstName":"Sarah","email":"sarahj@university.edu"}'),
+        saveProfile(){
+          localStorage.setItem('ignite_profile', JSON.stringify(this.profile));
+        },
+
+        // ------- Dashboard: News -------
+        news: [
+          {id:1, title:'New Computer Science Lab Opens on Campus', tag:'Campus', date:'Oct 20, 2025', img:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=800&auto=format&fit=crop', snippet:'State-of-the-art facility features cutting-edge technology and collaborative workspaces for students.'},
+          {id:2, title:'Spring 2026 Registration Now Open', tag:'Academic', date:'Oct 18, 2025', img:'https://images.unsplash.com/photo-1523580494863-6f3031224c94?q=80&w=800&auto=format&fit=crop', snippet:'Students can now register for spring semester courses. Priority registration ends November 1st.'},
+          {id:3, title:'Career Fair Success: 500+ Students Connected with Employers', tag:'Career', date:'Oct 15, 2025', img:'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?q=80&w=800&auto=format&fit=crop', snippet:'Annual fall career fair brings together top companies and talented students for networking opportunities.'}
         ],
-        courses:[
-          {
-            id:'cs301',code:'CS 301 • Dr. Emily Chen',
-            title:'Advanced Web Development',instructor:'Dr. Emily Chen',
-            classmates:45,nextClass:'Oct 21, 10:00 AM',
-            banner:'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=1600&auto=format&fit=crop',
-            schedule:'Mon & Wed 10:00–11:30 AM',location:'Room 301, CS Building',
-            officeHours:'Tue & Thu 2:00–4:00 PM',
-            modules:[{id:'m1'},{id:'m2'}],
-            announcements:[
-              {id:'a1',title:'Welcome to Advanced Web Development!',priority:'high',
-               body:'Please review the syllabus and set up your environment before class.',
-               date:'Sept 1, 2025',time:'9:00 AM',pinned:true},
-              {id:'a2',title:'Project Teams Formation Deadline',priority:'high',
-               body:'Team formation for the final project is due by Sept 20th.',
-               date:'Sept 15, 2025',time:'2:30 PM',pinned:true},
-              {id:'a3',title:'Office Hours Update',priority:'medium',
-               body:'Office hours moved to Wed 3–5 PM this week.',
-               date:'Oct 1, 2025',time:'11:15 AM',pinned:false}
-            ]
-          },
-          {id:'cs201',code:'CS 201 • Prof. Michael Zhang',
-           title:'Data Structures & Algorithms',instructor:'Prof. Michael Zhang',
-           classmates:60,nextClass:'Oct 22, 2:00 PM',
-           banner:'https://images.unsplash.com/photo-1517430816045-df4b7de11d1d?q=80&w=1600&auto=format&fit=crop',
-           schedule:'Tue & Thu 2:00–3:30 PM',location:'Room 210, CS Building',
-           officeHours:'Mon 1:00–3:00 PM',modules:[{id:'m1'},{id:'m2'}],announcements:[]},
-          {id:'math101',code:'MATH 101 • Dr. Sarah Johnson',
-           title:'Linear Algebra',instructor:'Dr. Sarah Johnson',
-           classmates:38,nextClass:'Oct 23, 11:00 AM',
-           banner:'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1600&auto=format&fit=crop',
-           schedule:'Fri 11:00 AM–1:00 PM',location:'Room 110, Math Building',
-           officeHours:'Wed 3:00–5:00 PM',modules:[{id:'m1'}],announcements:[]}
+        important: [
+          {id:1,title:'Data Structures Quiz',when:'Nov 10 • 10:30 AM'},
+          {id:2,title:'Linear Algebra Midterm',when:'Nov 15 • 1:00 PM'},
+          {id:3,title:'Project Teams Due',when:'Nov 20 • 11:59 PM'}
         ],
-        currentCourse:null,
-        openCourse(id){this.currentCourse=this.courses.find(c=>c.id===id);this.tab='course';this.tab2='Syllabus';window.scrollTo({top:0,behavior:'smooth'});},
-        pinnedCount(){return(this.currentCourse?.announcements||[]).filter(a=>a.pinned).length;}
+
+        // ------- Calendar state -------
+        cal: (()=>{
+          const d=new Date();
+          return {y:d.getFullYear(), m:d.getMonth()};
+        })(),
+        get daysMatrix(){
+          const {y,m}=this.cal;
+          const first=new Date(y,m,1);
+          const startIdx=first.getDay(); // 0-6
+          const daysInMonth=new Date(y,m+1,0).getDate();
+          const prevDays=new Date(y,m,0).getDate();
+
+          const cells=[];
+          // previous month fillers
+          for(let i=startIdx-1;i>=0;i--){
+            cells.push({day:prevDays-i,inMonth:false,date:new Date(y,m-1,prevDays-i)});
+          }
+          // current month
+          for(let d=1; d<=daysInMonth; d++){
+            cells.push({day:d,inMonth:true,date:new Date(y,m,d)});
+          }
+          // next fillers to complete 6 rows
+          while(cells.length%7!==0) {
+            const d = cells.length - (startIdx + daysInMonth) + 1;
+            cells.push({day:d,inMonth:false,date:new Date(y,m+1,d)});
+          }
+          return cells;
+        },
+        monthLabel(){
+          return new Date(this.cal.y,this.cal.m,1).toLocaleString('en', {month:'long', year:'numeric'});
+        },
+        prevMonth(){
+          if(this.cal.m===0){this.cal.m=11;this.cal.y--;} else {this.cal.m--;}
+        },
+        nextMonth(){
+          if(this.cal.m===11){this.cal.m=0;this.cal.y++;} else {this.cal.m++;}
+        },
+        isToday(d){
+          const t=new Date();
+          return d.inMonth && d.date.getFullYear()===t.getFullYear() && d.date.getMonth()===t.getMonth() && d.date.getDate()===t.getDate();
+        },
+
+        // ------- Courses -------
+        courseCards: [
+          {id:1,title:'Advanced Web Development',instructor:'Dr. Emily Chen',modules:12,students:'45',next:'Oct 21, 10:00 AM',image:'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop'},
+          {id:2,title:'Data Structures & Algorithms',instructor:'Prof. Michael Zhang',modules:15,students:'60',next:'Oct 22, 2:00 PM',image:'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop'},
+          {id:3,title:'Linear Algebra',instructor:'Dr. Sarah Johnson',modules:10,students:'38',next:'Oct 23, 11:00 AM',image:'https://images.unsplash.com/photo-1523246191918-0c2f021d2b9a?q=80&w=1600&auto=format&fit=crop'}
+        ],
+        courseDetail: {
+          id:1, code:'CS 301', title:'Advanced Web Development', instructorName:'Dr. Emily Chen',
+          schedule:'Monday & Wednesday, 10:00 AM - 11:30 AM',
+          location:'Room 301, CS Building',
+          officeHours:'Tuesday & Thursday, 2:00 PM - 4:00 PM',
+          pinned:[1,2,3],
+          announcements:[
+            {id:1, title:'Welcome to Advanced Web Development!', body:'Welcome everyone! Please review the syllabus and set up your dev environment before our first class.', priority:'high', date:'Sept 1, 2025', time:'9:00 AM'},
+            {id:2, title:'Project Teams Formation Deadline', body:'Reminder: Team formation is due by Sept 20th. Use the discussion board to find teammates (3-4 members).', priority:'high', date:'Sept 15, 2025', time:'2:30 PM'},
+            {id:3, title:'Office Hours Update', body:'Office hours moved to Wednesday 3–5 PM due to a faculty meeting. Apologies for any inconvenience.', priority:'medium', date:'Oct 1, 2025', time:'11:15 AM'}
+          ]
+        },
+        openCourse(id){
+          // you could fetch different detail by id; for now we reuse the same sample detail.
+          this.page='course';
+        },
+
+        // ------- AI Assistant -------
+        aiTab: 'chat',
+        faq: [
+          'How do I submit assignments?',
+          'When are grades posted?',
+          'How can I contact my instructor?',
+          'What’s the late submission policy?',
+          'How do I access lecture recordings?'
+        ],
+
+        // Chat
+        chat: {
+          input:'',
+          messages:[
+            {id:1, role:'assistant', text:"Hello! I'm your AI Teaching Assistant. I'm here to help you with questions, summarize lectures, generate quizzes, and create personalized study plans. How can I assist you today?"}
+          ]
+        },
+        sendChat(){
+          const text=this.chat.input.trim();
+          if(!text) return;
+          this.chat.messages.push({id:Date.now(), role:'user', text});
+          // simple canned reply
+          this.chat.messages.push({id:Date.now()+1, role:'assistant', text:'Got it! Here’s a quick tip: include your course code (e.g., “CS 301”) for a more targeted answer.'});
+          this.chat.input='';
+          this.$nextTick(()=> {
+            const el=document.getElementById('chatScroll');
+            el && (el.scrollTop = el.scrollHeight);
+          });
+        },
+
+        // Course+Lectures for Summary/Quiz
+        courses: [
+          {code:'CS 401', lectures:[
+            {id:'cs401-1', title:'Introduction to React'},
+            {id:'cs401-2', title:'State Management with Hooks'},
+            {id:'cs401-3', title:'Component Lifecycle'},
+            {id:'cs401-4', title:'Advanced Patterns'},
+            {id:'cs401-5', title:'Performance Optimization'},
+          ]},
+          {code:'CS 301', lectures:[
+            {id:'cs301-1', title:'HTTP & REST'},
+            {id:'cs301-2', title:'Frontend Architecture'},
+            {id:'cs301-3', title:'Routing & SPA'},
+          ]},
+          {code:'CS 350', lectures:[
+            {id:'cs350-1', title:'Algorithm Analysis'},
+            {id:'cs350-2', title:'Sorting & Searching'},
+            {id:'cs350-3', title:'Trees & Graphs'},
+          ]},
+          {code:'ENG 202', lectures:[
+            {id:'eng202-1', title:'Rhetorical Strategies'},
+            {id:'eng202-2', title:'Synthesis & Argument'},
+          ]},
+          {code:'MATH 201', lectures:[
+            {id:'math201-1', title:'Limits & Continuity'},
+            {id:'math201-2', title:'Derivatives'},
+          ]},
+          {code:'PHYS 201', lectures:[
+            {id:'phys201-1', title:'Kinematics'},
+            {id:'phys201-2', title:'Dynamics'},
+          ]},
+        ],
+        selectedCourse:'CS 401',
+        selectedLectures:[],
+        currentLectures(){
+          const c=this.courses.find(x=>x.code===this.selectedCourse);
+          return c? c.lectures : [];
+        },
+        toggleLecture(id){
+          const i=this.selectedLectures.indexOf(id);
+          if(i>=0) this.selectedLectures.splice(i,1);
+          else this.selectedLectures.push(id);
+        },
+        summary:{html:''},
+        generateSummary(){
+          const titles=this.currentLectures().filter(l=>this.selectedLectures.includes(l.id)).map(l=>l.title);
+          this.summary.html = `
+            <h4>Summary for ${this.selectedCourse}</h4>
+            <ul>${titles.map(t=>`<li><strong>${t}:</strong> key concepts, practical examples, and typical pitfalls.</li>`).join('')}</ul>
+            <p><em>Main takeaways:</em> build foundations, practice frequently, and connect concepts across lectures.</p>
+          `;
+        },
+
+        // Quiz
+        quiz:{course:'CS 401', lectures:[]},
+        lecturesByCode(code){
+          const c=this.courses.find(x=>x.code===code);
+          return c? c.lectures : [];
+        },
+        toggleQuizLecture(id){
+          const i=this.quiz.lectures.indexOf(id);
+          if(i>=0) this.quiz.lectures.splice(i,1);
+          else this.quiz.lectures.push(id);
+        },
+        quizOut:[],
+        generateQuiz(){
+          // simple generator
+          this.quizOut = this.quiz.lectures.map((lid,idx)=>({
+            q:`What is a key concept from “${(this.lecturesByCode(this.quiz.course).find(l=>l.id===lid)||{}).title || 'Selected Lecture'}”?`,
+            options:['Basic principles','Advanced techniques','Practical applications','All of the above'],
+            answer:'All of the above'
+          }));
+        },
+
+        // Study Plan
+        plan:{goals:'', pace:''},
+        planOut:[],
+        generatePlan(){
+          const g=this.plan.goals || 'Improve overall performance across courses';
+          const p=this.plan.pace || '10–12 hrs/week';
+          this.planOut = [
+            {title:'Weekly Structure', steps:[
+              'Mon/Wed/Fri: 60–90 min focused problem-solving',
+              'Tue/Thu: Review notes + summarize key ideas',
+              'Weekend: 2–3 hrs project or past papers'
+            ]},
+            {title:'Focus Areas', steps:[
+              `Goals: ${g}`,
+              'Prioritize weak topics from latest quizzes/assignments',
+              'Schedule checkpoints every Sunday evening'
+            ]},
+            {title:'Time Allocation', steps:[
+              `Planned study time: ${p}`,
+              'Split time evenly across active courses unless deadlines require rebalancing'
+            ]}
+          ];
+        }
       }
     }
   </script>
