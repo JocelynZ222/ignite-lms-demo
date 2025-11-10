@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ignite LMS • Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <style>
+    /* Custom styles for the calendar */
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+      text-align: center;
+    }
+    .day-header {
+      font-weight: 500;
+      color: #64748b; /* slate-500 */
+      font-size: 0.75rem; /* text-xs */
+    }
+    .date-cell {
+      padding: 6px 0;
+      cursor: pointer;
+      border-radius: 6px;
+      transition: background-color 0.1s;
+      font-size: 0.875rem; /* text-sm */
+    }
+    .date-cell:hover:not(.empty-cell):not(.current-day) {
+      background-color: #fff7ed; /* amber-50 */
+    }
+    .current-day {
+      background-color: #fcd34d; /* amber-300 */
+      font-weight: 600;
+    }
+    .has-event {
+      position: relative;
+    }
+    .has-event::after {
+      content: '';
+      position: absolute;
+      bottom: 2px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 4px;
+      height: 4px;
+      background-color: #ef4444; /* red-500 */
+      border-radius: 50%;
+    }
+    .selected-date {
+      background-color: #f59e0b; /* amber-500 */
+      color: white;
+      font-weight: 600;
+    }
+    .selected-date.has-event::after {
+      background-color: white;
+    }
+  </style>
+</head>
+<body class="bg-neutral-50 text-slate-900" x-data="{ 
+  tab: 'dashboard', 
+  userName: 'Sarah', 
+  messageOfTheDay: 'Believe in yourself and your abilities! ✨',
+  
+  // News & Events Data
+  newsEvents: [
+    { type: 'NEWS', title: 'New Computer Science Lab Opens on Campus', date: 'Oct 20, 2025', description: 'Cutting-edge workspace for students and researchers.', image: 'https://images.unsplash.com/photo-1518779578993-ec3579fee39f?q=80&w=400', link: '#news-lab-opening' },
+    { type: 'EVENT', title: 'Spring 2026 Registration Now Open', date: 'Oct 18, 2025', description: 'Priority registration ends Nov 1. Check your time slot now!', image: 'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?q=80&w=400', link: '#event-registration' },
+    
+    // Kept Picsum link for reliability
+    { type: 'NEWS', title: 'Guest Lecture: The Future of AI in Education', date: 'Oct 15, 2025', description: 'Prof. Anya Sharma from Tech University to speak on Oct 25.', image: 'https://picsum.photos/id/237/200/300', link: '#news-ai-lecture' },
+    
+    // Kept Picsum link for reliability
+    { type: 'EVENT', title: 'Career Fair 2025: Meet Top Employers', date: 'Oct 12, 2025', description: 'Explore internship and job opportunities. RSVP by Oct 30.', image: 'https://picsum.photos/id/163/200/300', link: '#event-career-fair' },
+    
+    // REVERTED IMAGE URL: Data Science
+    { type: 'NEWS', title: 'New Online Course on Data Science Fundamentals', date: 'Oct 10, 2025', description: 'Enroll now for an exciting journey into data analytics!', image: 'https://images.unsplash.com/photo-1542831371-29b0f74f9713?q=80&w=400', link: '#news-data-science' }
+  ],
+
+  // Calendar data
+  currentMonth: 10, 
+  currentYear: 2025,
+  selectedDate: null,
+  
+  // Dummy event data for the calendar
+  calendarEvents: {
+    '2025-10-15': [
+      { type: 'Assignment', title: 'WebDev Project Proposal Due', course: 'Advanced Web Development', time: '11:59 PM' },
+      { type: 'Quiz', title: 'Data Structures Chapter 3 Quiz', course: 'Data Structures & Algorithms', time: '2:00 PM' }
+    ],
+    '2025-10-21': [
+      { type: 'Assignment', title: 'Linear Algebra Midterm Review Questions', course: 'Linear Algebra', time: '10:00 AM' }
+    ],
+    '2025-10-25': [ 
+      { type: 'Event', title: 'Guest Lecture: Future of AI in Education', course: 'General Campus Event', time: '3:00 PM' }
+    ],
+    '2025-10-28': [
+      { type: 'Quiz', title: 'WebDev Tailwind CSS Basics Quiz', course: 'Advanced Web Development', time: '8:00 AM' }
+    ],
+    '2025-10-30': [ 
+      { type: 'Event', title: 'Career Fair RSVP Deadline', course: 'Career Services', time: '5:00 PM' }
+    ]
+  },
+  
+  // Function to get the calendar data for October 2025
+  getCalendarDays() {
+    const daysInMonth = 31; 
+    const firstDay = 3; 
+    let days = [];
+    
+    // Add empty cells for days before the 1st
+    for(let i = 0; i < firstDay; i++) {
+      days.push({ day: '', fullDate: '', empty: true });
+    }
+    
+    // Add days of the month
+    for(let i = 1; i <= daysInMonth; i++) {
+      const fullDate = `2025-10-${String(i).padStart(2, '0')}`;
+      const isToday = (i === 9); 
+      const hasEvent = !!this.calendarEvents[fullDate];
+      days.push({ day: i, fullDate, empty: false, isToday, hasEvent });
+    }
+    return days;
+  },
+
+  // Function to handle date click
+  selectDate(day) {
+    if (day.empty) return;
+    this.selectedDate = day.fullDate;
+  }
+}">
+  <aside class="fixed left-0 top-0 h-screen w-64 bg-white border-r flex flex-col z-10">
+    <div class="p-5 border-b">
+      <div class="text-amber-600 font-extrabold text-xl">Ignite</div>
+      <div class="text-xs text-slate-500">Fall 2025</div>
+    </div>
+
+    <nav class="p-2 space-y-1 text-sm flex-1">
+      <template x-for="item in [
+        {k:'dashboard',label:'Dashboard', icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l-2 2m-2-2v10a1 1 0 01-1 1h-3m-3 0V9a1 1 0 011-1h6a1 1 0 011 1v10a1 1 0 01-1 1h-3', iconType: 'home'},
+        {k:'courses',label:'Courses', icon:'M4 6h16M4 12h16m-7 6h7', iconType: 'book-open'},
+        {k:'assignments',label:'Assignments', icon:'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', iconType: 'document-text'},
+        {k:'quizzes',label:'Quizzes & Tests', icon:'M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m0 0l-3 3m7-3v4a2 2 0 002 2h2', iconType: 'clipboard-list'},
+        {k:'grades',label:'Grades', icon:'M3 6l7-7 7 7M10 3v18', iconType: 'chart-bar'},
+        {k:'ai',label:'AI Assistant', icon:'M9.333 9.75a2.5 2.5 0 005.334 0 2.5 2.5 0 00-5.334 0zM12 21a9 9 0 110-18 9 9 0 010 18z', iconType: 'sparkles'}
+      ]" :key="item.k">
+        <button
+          class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-amber-50"
+          :class="tab===item.k && 'bg-amber-100 text-amber-800 font-medium'"
+          @click="tab=item.k">
+          <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" :d="item.icon" />
+          </svg>
+          <span x-text="item.label"></span>
+        </button>
+      </template>
+    </nav>
+
+    <div class="p-2 border-t text-sm">
+      <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-amber-50"
+              :class="tab==='profile' && 'bg-amber-100 text-amber-800 font-medium'"
+              @click="tab='profile'">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Profile
+      </button>
+      <button class="w-full text-left px-3 py-2 rounded flex items-center gap-3 hover:bg-amber-50"
+              :class="tab==='settings' && 'bg-amber-100 text-amber-800 font-medium'"
+              @click="tab='settings'">
+              <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.608 3.3 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Settings
+      </button>
+      <div class="mt-3 px-3">
+        <div class="font-medium">Sarah J.</div>
+        <div class="text-slate-500 text-xs">sarahj@university.edu</div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="ml-64 p-8 space-y-8 min-h-screen">
+
+    <!-- DASHBOARD -->
+    <section x-show="tab==='dashboard'" x-cloak>
+      <div class="space-y-6">
+
+        <div class="bg-amber-600 text-white rounded-2xl p-6 shadow-lg">
+          <div class="text-2xl font-bold" x-text="'Welcome back, ' + userName + '! 👋'"></div>
+          <div class="text-md opacity-90 mt-1" x-text="messageOfTheDay"></div>
+        </div>
+
+        <div class="grid lg:grid-cols-3 gap-6">
+
+          <div class="lg:col-span-2 bg-white border rounded-xl shadow-md p-5">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <svg class="h-6 w-6 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v10a2 2 0 002 2h1l-3-3m0 0l3 3m-3-3v2c0 .285.064.557.186.81l1.597 3.253a1 1 0 00.908.577h3.358a1 1 0 00.908-.577l1.597-3.253A2 2 0 0022 18V6a2 2 0 00-2-2h-1a2 2 0 00-2 2v10a2 2 0 01-2 2z" /></svg>
+              Latest News & Events
+            </h2>
+            <div class="space-y-4 text-sm">
+              <template x-for="item in newsEvents" :key="item.title">
+                <a :href="item.link" class="group flex gap-4 items-start border-b pb-4 last:border-b-0 hover:bg-gray-50 -mx-2 px-2 py-2 rounded-lg transition-colors duration-150">
+                  <img class="h-16 w-24 rounded object-cover flex-shrink-0" :src="item.image" :alt="item.title">
+                  <div>
+                    <div class="font-medium text-slate-800 group-hover:text-amber-700" x-text="item.title"></div>
+                    <div class="text-xs font-medium mt-1"
+                         :class="{
+                           'text-amber-600': item.type === 'NEWS',
+                           'text-green-600': item.type === 'EVENT'
+                         }"
+                         x-text="item.type"></div>
+                    <div class="text-slate-500 mt-1" x-text="item.date + ' • ' + item.description"></div>
+                  </div>
+                </a>
+              </template>
+            </div>
+          </div>
+
+          <div class="bg-white border rounded-xl shadow-md p-5">
+            <h2 class="text-xl font-semibold mb-4 flex items-center gap-2">
+              <svg class="h-6 w-6 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-4 4h4M4 11h16M7 21h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+              Important Dates
+            </h2>
+
+            <div>
+              <div class="flex justify-between items-center mb-3">
+                <button disabled class="text-slate-400">&lt;</button>
+                <span class="font-medium text-lg">October 2025</span>
+                <button disabled class="text-slate-400">&gt;</button>
+              </div>
+
+              <div class="calendar-grid">
+                <div class="day-header">S</div>
+                <div class="day-header">M</div>
+                <div class="day-header">T</div>
+                <div class="day-header">W</div>
+                <div class="day-header">T</div>
+                <div class="day-header">F</div>
+                <div class="day-header">S</div>
+
+                <template x-for="day in getCalendarDays()">
+                  <div class="date-cell"
+                       :class="{
+                         'empty-cell': day.empty,
+                         'current-day': day.isToday && !day.empty,
+                         'has-event': day.hasEvent,
+                         'selected-date': day.fullDate === selectedDate && !day.empty && !day.isToday
+                       }"
+                       @click="selectDate(day)">
+                    <span x-text="day.day"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            
+            <hr class="my-4">
+
+            <div class="mt-4">
+              <div class="font-semibold mb-2">Upcoming Deadlines</div>
+              <template x-if="selectedDate">
+                <div>
+                  <div class="text-sm text-slate-700 font-medium mb-2" x-text="new Date(selectedDate + 'T00:00:00').toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })"></div>
+                  <template x-if="calendarEvents[selectedDate] && calendarEvents[selectedDate].length > 0">
+                    <div class="space-y-3">
+                      <template x-for="event in calendarEvents[selectedDate]">
+                        <div class="p-3 rounded-lg border" :class="event.type.includes('Assignment') ? 'border-red-200 bg-red-50' : (event.type.includes('Quiz') ? 'border-blue-200 bg-blue-50' : 'border-green-200 bg-green-50')">
+                          <div class="font-medium text-sm" x-text="event.title"></div>
+                          <div class="text-xs text-slate-600 mt-1">
+                            <span :class="event.type.includes('Assignment') ? 'text-red-600 font-bold' : (event.type.includes('Quiz') ? 'text-blue-600 font-bold' : 'text-green-600 font-bold')" x-text="event.type"></span>
+                            • <span x-text="event.course"></span> • <span x-text="event.time"></span>
+                          </div>
+                        </div>
+                      </template>
+                    </div>
+                  </template>
+                  <template x-if="!calendarEvents[selectedDate] || calendarEvents[selectedDate].length === 0">
+                    <div class="text-sm text-slate-500 italic">No assignments or quizzes due or events on this date.</div>
+                  </template>
+                </div>
+              </template>
+              <template x-if="!selectedDate">
+                 <div class="text-sm text-slate-500 italic">Click a date on the calendar to see deadlines and events.</div>
+              </template>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <div class="bg-white border rounded-xl shadow-md p-5 mt-6">
+        <h2 class="text-xl font-semibold mb-3 flex items-center gap-2">
+          <svg class="h-6 w-6 text-amber-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 5.636l-3.536 3.536m-1.414 1.414l-3.536 3.536m0-4.95l2.121-2.121m3.536 3.536L12 12m9 2V10a2 2 0 00-2-2h-3.586a1 1 0 01-.707-.293l-4.414-4.414A2 2 0 008 2H5a2 2 0 00-2 2v16a2 2 0 002 2h6.586a1 1 0 00.707-.293l4.414-4.414A2 2 0 0022 14v-4z" /></svg>
+          Help & Technical Support
+        </h2>
+        <p class="text-sm text-slate-600 mb-4">Need help with technical issues, system access, or course features?</p>
+        <div class="grid sm:grid-cols-2 gap-4 text-sm">
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div class="font-medium text-slate-800">✉️ Email Support</div>
+            <a href="mailto:support@ignitelms.edu" class="text-amber-600 hover:text-amber-700">support@ignitelms.edu</a>
+          </div>
+          <div class="bg-slate-50 p-3 rounded-lg border border-slate-200">
+            <div class="font-medium text-slate-800">📞 Phone/Office Hours</div>
+            <div class="text-slate-600">Mon-Fri: 9:00 AM - 5:00 PM EST</div>
+            <div class="text-slate-600">(555) 123-4567</div>
+          </div>
+        </div>
+        <button class="mt-4 py-2 px-4 bg-slate-800 text-white rounded-lg text-sm hover:bg-slate-700 transition">Submit a Support Ticket</button>
+      </div>
+
+    </section>
+
+   
+  </main>
+</body>
+</html>
