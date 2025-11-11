@@ -136,6 +136,7 @@
 
       <div class="max-w-[1200px] mx-auto px-5 sm:px-8 py-8">
 
+        <!-- ================= DASHBOARD TAB ================= -->
         <!-- DASHBOARD (restored with calendar) -->
         <!-- DASHBOARD -->
         <section x-show="page==='dashboard'" x-cloak
@@ -289,6 +290,7 @@
             </div>
           </div>
         </section>
+        <!-- ================= END OF DASHBOARD TAB ================= -->
 
         <!-- ================= COURSES TAB ================= -->
         <!-- COURSES -->
@@ -389,23 +391,30 @@
             </template>
           </div>
         </section>
+        <!-- ================= END OF COURSES TAB ================= -->
+
         <!-- ================= ASSIGNMENTS TAB ================= -->
         <section x-show="page === 'assignments'">
           <!-- BRANCH: assignments-tab -->
           <div class="p-6 text-center text-slate-500">Assignments page (to be built)</div>
         </section>
+        <!-- ================= END OF ASSIGNMENTS TAB ================= -->
 
         <!-- ================= QUIZZES TAB ================= -->
         <section x-show="page === 'quizzes'">
           <!-- BRANCH: quizzes-tab -->
           <div class="p-6 text-center text-slate-500">Quizzes page (to be built)</div>
         </section>
+        <!-- ================= END OF QUIZZES TAB ================= -->
 
         <!-- ================= GRADES TAB ================= -->
         <section x-show="page === 'grades'">
           <!-- BRANCH: grades-tab -->
           <div class="p-6 text-center text-slate-500">Grades page (to be built)</div>
         </section>
+        <!-- ================= END OF GRADES TAB ================= -->
+
+        <!-- ================= AI ASSISTANT TAB ================= -->
         <!-- AI ASSISTANT -->
         <section x-show="page==='ai'" x-cloak>
           <!-- BRANCH: ai-assistant-tab -->
@@ -591,7 +600,9 @@
             </div>
           </div>
         </section>
+        <!-- ================= END OF AI ASSISTANT TAB ================= -->
 
+        <!-- ================= PROFILE TAB ================= -->
         <!-- PROFILE -->
         <section x-show="page==='profile'" x-cloak>
             <!-- BRANCH: profile-settings -->
@@ -809,7 +820,9 @@
             </div>
 
         </section>
+        <!-- ================= END OF PROFILE TAB ================= -->
 
+        <!-- ================= SETTINGS TAB ================= -->
         <!-- SETTINGS -->
         <section x-show="page==='settings'" x-cloak>
           <!-- BRANCH: settings -->
@@ -818,6 +831,7 @@
             <div class="text-sm text-slate-600">Additional preferences can go here.</div>
           </div>
         </section>
+        <!-- ================= END OF SETTINGS TAB ================= -->
       </div>
     </main>
   </div>
