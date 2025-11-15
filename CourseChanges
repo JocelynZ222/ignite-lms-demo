@@ -1,0 +1,2360 @@
+<!doctype html>
+<html lang="en" x-data="app()" :class="{'overflow-hidden': sidebarOpen}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ignite LMS</title>
+
+  <!-- Tailwind -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rust: {
+              50:'#fdf4f2',100:'#fde8e4',200:'#f8d3cc',300:'#efb7ad',400:'#e19172',500:'#cf6b47',600:'#b65033',700:'#93402c',800:'#783526',900:'#5f2c21'
+            },
+            sand: {
+              25:'#fdfbf7',50:'#fbf7ef',100:'#f4ebdc',200:'#e9dcc5',300:'#d6c2a0',400:'#b79a71',500:'#9a7a4f',600:'#7c5f3d',700:'#634b31',800:'#4b3825',900:'#3b2d1f'
+            }
+          },
+          boxShadow: {
+            card:'0 10px 30px rgba(15,23,42,0.08)'
+          },
+          borderRadius: {
+            xl2:'1.1rem'
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    [x-cloak] { display: none !important; }
+  </style>
+</head>
+
+<body class="min-h-screen bg-sand-25 text-slate-900 antialiased">
+  <div class="min-h-screen flex">
+    <!-- =============== SIDEBAR =============== -->
+    <aside
+      class="hidden lg:flex lg:flex-col w-64 xl:w-72 bg-white border-r border-sand-200/70 px-4 py-5 space-y-6">
+      <!-- Logo / Brand -->
+      <div class="flex items-center gap-3 px-1">
+        <div class="h-10 w-10 rounded-2xl bg-rust-100 flex items-center justify-center">
+          <span class="text-xl">✨</span>
+        </div>
+        <div>
+          <div class="text-sm font-semibold tracking-tight text-slate-900">Ignite LMS</div>
+          <div class="text-xs text-slate-500">Vibe Coding • Group 2</div>
+        </div>
+      </div>
+
+      <!-- Main nav -->
+      <nav class="space-y-1 text-sm">
+        <p class="px-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500 mb-1">
+          Main
+        </p>
+
+        <button
+          @click="page='dashboard'"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='dashboard'
+            ? 'bg-rust-500 text-white shadow-card'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">🏠</span>
+            <span class="text-sm font-medium">Dashboard</span>
+          </div>
+          <span class="text-[11px] opacity-80">Today</span>
+        </button>
+
+        <button
+          @click="page='courses'"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='courses'
+            ? 'bg-rust-100 text-rust-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">📚</span>
+            <span class="text-sm font-medium">Courses</span>
+          </div>
+          <span class="text-[11px] text-slate-500">3 active</span>
+        </button>
+
+        <button
+          @click="page='assignments'"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='assignments'
+            ? 'bg-rust-100 text-rust-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">✅</span>
+            <span class="text-sm font-medium">Assignments</span>
+          </div>
+          <span class="text-[11px] text-slate-500">This week</span>
+        </button>
+
+        <button
+          @click="page='quiz'"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='quiz'
+            ? 'bg-rust-100 text-rust-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">🧠</span>
+            <span class="text-sm font-medium">Quiz Builder</span>
+          </div>
+          <span class="text-[11px] text-slate-500">Beta</span>
+        </button>
+
+        <button
+          @click="page='ai'"
+          class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='ai'
+            ? 'bg-rust-100 text-rust-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <div class="flex items-center gap-2.5">
+            <span class="text-lg">✨</span>
+            <span class="text-sm font-medium">AI Assistant</span>
+          </div>
+          <span class="text-[11px] text-slate-500">Ask Vibe</span>
+        </button>
+      </nav>
+
+      <!-- Separator -->
+      <div class="border-t border-sand-200/80 pt-4 mt-2" />
+
+      <!-- Secondary nav -->
+      <nav class="space-y-1 text-sm">
+        <p class="px-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500 mb-1">
+          Workspace
+        </p>
+
+        <button
+          @click="page='calendar'"
+          class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='calendar'
+            ? 'bg-sand-100 text-slate-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <span class="text-lg">📅</span>
+          <span class="text-sm font-medium">Calendar</span>
+        </button>
+
+        <button
+          @click="page='analytics'"
+          class="w-full flex items-center gap-2.5 px-3 py-2.5 rounded-xl transition text-left"
+          :class="page==='analytics'
+            ? 'bg-sand-100 text-slate-900'
+            : 'text-slate-700 hover:bg-sand-50'">
+          <span class="text-lg">📈</span>
+          <span class="text-sm font-medium">Progress</span>
+        </button>
+      </nav>
+
+      <!-- Bottom profile -->
+      <div class="mt-auto pt-4 border-t border-sand-200/70">
+        <button
+          @click="page='profile'"
+          class="w-full flex items-center justify-between gap-3 px-2.5 py-2.5 rounded-2xl hover:bg-sand-50 transition">
+          <div class="flex items-center gap-3">
+            <div class="h-9 w-9 rounded-2xl bg-sand-100 flex items-center justify-center">
+              <span class="text-lg">👩🏻‍💻</span>
+            </div>
+            <div>
+              <div class="text-xs font-medium text-slate-900">Jocelyn Zhang</div>
+              <div class="text-[11px] text-slate-500">MBA · Group 2</div>
+            </div>
+          </div>
+          <button
+            @click.stop="page='settings'"
+            class="h-8 w-8 rounded-xl border border-sand-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:border-slate-300">
+            <span class="text-lg">⚙️</span>
+          </button>
+        </button>
+      </div>
+    </aside>
+
+    <!-- =============== MOBILE SIDEBAR =============== -->
+    <div class="lg:hidden">
+      <div
+        class="fixed inset-0 bg-slate-900/40 z-40"
+        x-show="sidebarOpen"
+        x-cloak
+        @click="sidebarOpen=false"
+        x-transition.opacity></div>
+
+      <aside
+        class="fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-sand-200/70 px-4 py-5 flex flex-col space-y-6"
+        x-show="sidebarOpen"
+        x-cloak
+        x-transition>
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="h-9 w-9 rounded-2xl bg-rust-100 flex items-center justify-center">
+              <span class="text-lg">✨</span>
+            </div>
+            <div>
+              <div class="text-sm font-semibold tracking-tight text-slate-900">Ignite LMS</div>
+              <div class="text-xs text-slate-500">Vibe Coding · Group 2</div>
+            </div>
+          </div>
+          <button
+            class="h-9 w-9 rounded-full border border-sand-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:border-slate-300"
+            @click="sidebarOpen=false">
+            ✕
+          </button>
+        </div>
+
+        <nav class="space-y-1 text-sm">
+          <p class="px-1 text-[11px] font-medium uppercase tracking-[0.12em] text-slate-500 mb-1">
+            Main
+          </p>
+
+          <button
+            @click="page='dashboard'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+            :class="page==='dashboard'
+              ? 'bg-rust-500 text-white shadow-card'
+              : 'text-slate-700 hover:bg-sand-50'">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🏠</span>
+              <span class="text-sm font-medium">Dashboard</span>
+            </div>
+            <span class="text-[11px] opacity-80">Today</span>
+          </button>
+
+          <button
+            @click="page='courses'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+            :class="page==='courses'
+              ? 'bg-rust-100 text-rust-900'
+              : 'text-slate-700 hover:bg-sand-50'">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">📚</span>
+              <span class="text-sm font-medium">Courses</span>
+            </div>
+            <span class="text-[11px] text-slate-500">3 active</span>
+          </button>
+
+          <button
+            @click="page='assignments'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+            :class="page==='assignments'
+              ? 'bg-rust-100 text-rust-900'
+              : 'text-slate-700 hover:bg-sand-50'">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">✅</span>
+              <span class="text-sm font-medium">Assignments</span>
+            </div>
+            <span class="text-[11px] text-slate-500">This week</span>
+          </button>
+
+          <button
+            @click="page='quiz'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+            :class="page==='quiz'
+              ? 'bg-rust-100 text-rust-900'
+              : 'text-slate-700 hover:bg-sand-50'">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">🧠</span>
+              <span class="text-sm font-medium">Quiz Builder</span>
+            </div>
+            <span class="text-[11px] text-slate-500">Beta</span>
+          </button>
+
+          <button
+            @click="page='ai'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-xl transition text-left"
+            :class="page==='ai'
+              ? 'bg-rust-100 text-rust-900'
+              : 'text-slate-700 hover:bg-sand-50'">
+            <div class="flex items-center gap-2.5">
+              <span class="text-lg">✨</span>
+              <span class="text-sm font-medium">AI Assistant</span>
+            </div>
+            <span class="text-[11px] text-slate-500">Ask Vibe</span>
+          </button>
+        </nav>
+
+        <div class="mt-auto pt-4 border-t border-sand-200/70">
+          <button
+            @click="page='profile'; sidebarOpen=false"
+            class="w-full flex items-center justify-between gap-3 px-2.5 py-2.5 rounded-2xl hover:bg-sand-50 transition">
+            <div class="flex items-center gap-3">
+              <div class="h-9 w-9 rounded-2xl bg-sand-100 flex items-center justify-center">
+                <span class="text-lg">👩🏻‍💻</span>
+              </div>
+              <div>
+                <div class="text-xs font-medium text-slate-900">Jocelyn Zhang</div>
+                <div class="text-[11px] text-slate-500">MBA · Group 2</div>
+              </div>
+            </div>
+            <button
+              @click.stop="page='settings'; sidebarOpen=false"
+              class="h-8 w-8 rounded-xl border border-sand-200 flex items-center justify-center text-slate-500 hover:text-slate-800 hover:border-slate-300">
+              <span class="text-lg">⚙️</span>
+            </button>
+          </button>
+        </div>
+      </aside>
+    </div>
+
+    <!-- =============== MAIN CONTENT =============== -->
+    <main class="flex-1 flex flex-col">
+      <!-- Top bar -->
+      <header class="h-16 border-b border-sand-200/70 bg-white flex items-center justify-between px-4 md:px-6">
+        <div class="flex items-center gap-3">
+          <button
+            class="lg:hidden h-9 w-9 rounded-xl border border-sand-200 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:border-slate-400"
+            @click="sidebarOpen=true">
+            ☰
+          </button>
+          <div>
+            <div class="text-xs font-medium text-slate-500 tracking-[0.18em] uppercase">
+              Vibe Coding · 5P19
+            </div>
+            <div class="text-sm font-semibold text-slate-900 flex items-center gap-1.5">
+              <span x-text="pageTitle"></span>
+              <span class="text-[10px] px-2 py-0.5 rounded-full bg-sand-100 text-slate-600" x-text="pageBadge"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+          <div class="hidden sm:flex items-center gap-2 text-xs text-slate-600 border border-sand-200 rounded-full px-3 py-1.5 bg-sand-25">
+            <span class="h-2 w-2 rounded-full bg-emerald-500"></span>
+            <span>Group 2 · Week 1 Prototype</span>
+          </div>
+          <button class="h-9 w-9 rounded-full border border-sand-200 flex items-center justify-center text-slate-600 hover:bg-sand-50">
+            🔔
+          </button>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <div class="flex-1 overflow-y-auto">
+        <!-- ================= DASHBOARD TAB ================= -->
+        <section x-show="page === 'dashboard'" x-cloak>
+          <div class="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+            <!-- Welcome banner -->
+            <div class="rounded-card bg-rust-500 text-white p-6 md:p-7 shadow-card rounded-3xl">
+              <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <div>
+                  <div class="text-[22px] md:text-2xl font-semibold flex items-center gap-2">
+                    Welcome back, Jocelyn ✨
+                  </div>
+                  <p class="text-sm text-rust-50/95 mt-1">
+                    Here’s a quick snapshot of your week in <span class="font-semibold">Ignite LMS</span>. Keep the vibe going!
+                  </p>
+                </div>
+                <div class="flex flex-wrap items-center gap-3">
+                  <div class="flex flex-col text-right">
+                    <span class="text-[11px] uppercase tracking-[0.18em] text-rust-50/80">Today</span>
+                    <span class="text-sm font-semibold" x-text="todayString"></span>
+                  </div>
+                  <button
+                    @click="page='calendar'"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 text-xs font-medium hover:bg-white/15 border border-white/20">
+                    <span>📅</span>
+                    <span>Open calendar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats + Calendar -->
+            <div class="grid lg:grid-cols-[1.3fr,minmax(0,1fr)] gap-5">
+              <!-- Left: stats -->
+              <div class="space-y-4">
+                <div class="grid sm:grid-cols-3 gap-4">
+                  <div class="rounded-xl2 bg-white border border-sand-200/80 p-4 shadow-card">
+                    <div class="flex items-center justify-between gap-2">
+                      <div>
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Active courses</p>
+                        <p class="mt-1 text-xl font-semibold text-slate-900">3</p>
+                      </div>
+                      <div class="h-9 w-9 rounded-xl bg-sand-100 flex items-center justify-center">
+                        <span class="text-lg">📚</span>
+                      </div>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500">CS 401, CS 350, MATH 201</p>
+                  </div>
+
+                  <div class="rounded-xl2 bg-white border border-sand-200/80 p-4 shadow-card">
+                    <div class="flex items-center justify-between gap-2">
+                      <div>
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">This week</p>
+                        <p class="mt-1 text-xl font-semibold text-slate-900">4</p>
+                      </div>
+                      <div class="h-9 w-9 rounded-xl bg-sand-100 flex items-center justify-center">
+                        <span class="text-lg">✅</span>
+                      </div>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500">Assignments & quizzes due</p>
+                  </div>
+
+                  <div class="rounded-xl2 bg-white border border-sand-200/80 p-4 shadow-card">
+                    <div class="flex items-center justify-between gap-2">
+                      <div>
+                        <p class="text-[11px] uppercase tracking-[0.16em] text-slate-500">Focus score</p>
+                        <p class="mt-1 text-xl font-semibold text-slate-900">82%</p>
+                      </div>
+                      <div class="h-9 w-9 rounded-xl bg-sand-100 flex items-center justify-center">
+                        <span class="text-lg">🔥</span>
+                      </div>
+                    </div>
+                    <p class="mt-2 text-xs text-slate-500">Based on logins & completions</p>
+                  </div>
+                </div>
+
+                <!-- Upcoming list -->
+                <div class="rounded-xl2 bg-white border border-sand-200/80 p-4 md:p-5 shadow-card">
+                  <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-slate-900">Upcoming this week</h2>
+                    <button
+                      @click="page='assignments'"
+                      class="text-[11px] font-medium text-rust-700 hover:text-rust-900">
+                      View all →
+                    </button>
+                  </div>
+                  <div class="space-y-3">
+                    <template x-for="item in dashboardUpcoming" :key="item.title">
+                      <div class="flex items-center justify-between gap-3 rounded-xl border border-sand-200 px-3 py-2.5">
+                        <div class="flex items-center gap-3">
+                          <div class="h-8 w-8 rounded-xl bg-sand-100 flex items-center justify-center text-sm">
+                            <span x-text="item.icon"></span>
+                          </div>
+                          <div>
+                            <div class="text-xs font-medium text-slate-900" x-text="item.title"></div>
+                            <div class="text-[11px] text-slate-500" x-text="item.meta"></div>
+                          </div>
+                        </div>
+                        <div class="text-[11px] text-slate-500 text-right" x-text="item.due"></div>
+                      </div>
+                    </template>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: mini calendar -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 p-4 md:p-5 shadow-card">
+                <div class="flex items-center justify-between mb-3">
+                  <h2 class="text-sm font-semibold text-slate-900">Mini calendar</h2>
+                  <div class="text-xs text-slate-500" x-text="calendarSubtitle"></div>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-[11px] text-slate-500 mb-2">
+                  <template x-for="d in ['M','T','W','T','F','S','S']" :key="d">
+                    <div class="h-6 flex items-center justify-center" x-text="d"></div>
+                  </template>
+                </div>
+                <div class="grid grid-cols-7 gap-1 text-[11px]">
+                  <template x-for="day in miniCalendar" :key="day.date">
+                    <button
+                      class="h-8 rounded-lg flex items-center justify-center border text-xs"
+                      :class="day.today
+                        ? 'bg-rust-500 text-white border-rust-500'
+                        : (day.hasItem
+                          ? 'bg-sand-100 text-slate-900 border-sand-200'
+                          : 'bg-white text-slate-700 border-sand-200/70')">
+                      <span x-text="day.label"></span>
+                    </button>
+                  </template>
+                </div>
+                <p class="mt-3 text-[11px] text-slate-500">
+                  Dots indicate days with deadlines in CS 401, CS 350, or MATH 201.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= COURSES TAB ================= -->
+        <section x-show="page === 'courses'" x-cloak>
+          <div class="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">Your courses</h1>
+                <p class="text-xs text-slate-500 mt-0.5">
+                  3 active courses this term · CS 401, CS 350, MATH 201
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                  Semester: Fall 2025
+                </button>
+                <button class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                  View as cards
+                </button>
+              </div>
+            </div>
+
+            <!-- Course cards -->
+            <div class="grid md:grid-cols-3 gap-4">
+              <template x-for="card in courseCards" :key="card.id">
+                <article class="rounded-2xl bg-white border border-sand-200/80 shadow-card overflow-hidden flex flex-col">
+                  <div class="relative h-32">
+                    <img
+                      :src="card.image"
+                      :alt="card.title"
+                      class="w-full h-full object-cover" />
+                    <div class="absolute inset-0 bg-gradient-to-t from-slate-900/45 via-slate-900/10 to-transparent"></div>
+                    <div class="absolute bottom-2 left-3 right-3 flex items-center justify-between text-[11px] text-white">
+                      <span class="px-2 py-0.5 rounded-full bg-slate-900/60 backdrop-blur-sm">
+                        <span x-text="card.modules + ' modules'"></span>
+                      </span>
+                      <span class="px-2 py-0.5 rounded-full bg-slate-900/60 backdrop-blur-sm">
+                        <span x-text="card.students + ' students'"></span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div class="p-4 flex-1 flex flex-col gap-3">
+                    <div>
+                      <h2 class="text-sm font-semibold text-slate-900" x-text="card.title"></h2>
+                      <p class="text-xs text-slate-500 mt-0.5" x-text="card.instructor"></p>
+                    </div>
+                    <div class="mt-auto flex flex-col gap-1.5 text-[11px] text-slate-600">
+                      <div class="flex items-center gap-1.5">
+                        <span>⏰</span>
+                        <span class="truncate" x-text="'Next: ' + card.next"></span>
+                      </div>
+                      <div class="flex items-center gap-1.5">
+                        <span>🏫</span>
+                        <span class="truncate" x-text="card.id === 3 ? 'MATH 201 · Linear Algebra' : (card.id === 2 ? 'CS 350 · Data Structures & Algorithms' : 'CS 401 · Advanced Web Development')"></span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="px-4 pb-4">
+                    <button
+                      class="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-rust-500 text-xs font-medium text-white hover:bg-rust-600"
+                      @click="openCourse(card.id)">
+                      <span>View course</span>
+                      <span>→</span>
+                    </button>
+                  </div>
+                </article>
+              </template>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SINGLE COURSE DETAIL ================= -->
+        <section x-show="page === 'course'" x-cloak>
+          <div class="p-4 md:p-6 max-w-6xl mx-auto space-y-6">
+            <!-- Breadcrumb -->
+            <div class="flex items-center justify-between gap-3">
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <button class="hover:text-slate-900" @click="page='courses'">Courses</button>
+                <span>/</span>
+                <span class="text-slate-900 font-medium" x-text="courseDetail.code || 'Course'"></span>
+              </div>
+              <button
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sand-200 bg-white text-[11px] text-slate-700 hover:bg-sand-50"
+                @click="page='courses'">
+                ← Back to all courses
+              </button>
+            </div>
+
+            <!-- Header -->
+            <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-5 md:p-6 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div class="space-y-1.5">
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sand-100 text-[11px] text-slate-700" x-text="courseDetail.code"></span>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-rust-50 text-[11px] text-rust-700">
+                    Active · Fall 2025
+                  </span>
+                </div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900" x-text="courseDetail.title"></h1>
+                <p class="text-xs text-slate-600">
+                  <span x-text="courseDetail.instructorName"></span> ·
+                  <span x-text="courseDetail.schedule"></span> ·
+                  <span x-text="courseDetail.location"></span>
+                </p>
+              </div>
+              <div class="flex flex-wrap items-center gap-2">
+                <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sand-200 bg-sand-25 text-[11px] text-slate-700 hover:bg-sand-50">
+                  📝 View gradebook
+                </button>
+                <button class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full border border-sand-200 bg-sand-25 text-[11px] text-slate-700 hover:bg-sand-50">
+                  📅 Add to calendar
+                </button>
+              </div>
+            </div>
+
+            <!-- Main content grid -->
+            <div class="grid lg:grid-cols-[minmax(0,1.7fr),minmax(0,1.1fr)] gap-5 items-start">
+              <!-- Left column: tabs -->
+              <section class="rounded-xl2 bg-sand-25 border border-sand-200/80 shadow-card p-4 md:p-5">
+                <div class="flex items-center justify-between gap-3 mb-4">
+                  <div>
+                    <h2 class="text-sm font-semibold text-slate-900">Course resources</h2>
+                    <p class="text-[11px] text-slate-500" x-text="courseDetail.title"></p>
+                  </div>
+                </div>
+
+                <!-- Resource tabs + content -->
+                <div class="mt-8">
+                  <!-- Tab pills -->
+                  <div class="flex flex-wrap gap-2 border-b border-sand-200 pb-3">
+                    <template x-for="tab in ['syllabus','slides','materials','dates','tools','textbooks']" :key="tab">
+                      <button
+                        type="button"
+                        @click="courseDetailTab = tab"
+                        class="px-4 py-2 text-sm rounded-full border transition shadow-sm"
+                        :class="courseDetailTab === tab
+                          ? 'bg-rust-500 text-white border-rust-500'
+                          : 'bg-sand-50 text-slate-700 border-sand-300 hover:bg-white hover:border-rust-300 hover:text-rust-700'">
+                        <span x-text="
+                          tab === 'syllabus'  ? 'Syllabus' :
+                          tab === 'slides'    ? 'Slides' :
+                          tab === 'materials' ? 'Materials' :
+                          tab === 'dates'     ? 'Important Dates' :
+                          tab === 'tools'     ? 'Software & Tools' :
+                                                'Textbooks'
+                        "></span>
+                      </button>
+                    </template>
+                  </div>
+
+                  <!-- Tab panels -->
+                  <div class="mt-5 space-y-5">
+                    <!-- Syllabus -->
+                    <div x-show="courseDetailTab === 'syllabus'" x-transition>
+                      <div class="space-y-5">
+                        <!-- Course Description -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-2 text-slate-900">Course Description</h2>
+                          <p class="text-sm text-slate-700 leading-relaxed"
+                             x-text="courseDetail.syllabus?.description || 'Course description coming soon.'"></p>
+                        </div>
+
+                        <!-- Learning Objectives -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Learning Objectives</h2>
+                          <template x-if="courseDetail.syllabus && courseDetail.syllabus.objectives && courseDetail.syllabus.objectives.length">
+                            <ul class="list-disc pl-5 text-sm text-slate-700 space-y-1">
+                              <template x-for="(obj, idx) in courseDetail.syllabus.objectives" :key="idx">
+                                <li x-text="obj"></li>
+                              </template>
+                            </ul>
+                          </template>
+                          <template x-if="!courseDetail.syllabus || !courseDetail.syllabus.objectives || !courseDetail.syllabus.objectives.length">
+                            <p class="text-sm text-slate-500">Objectives will be posted soon.</p>
+                          </template>
+                        </div>
+
+                        <!-- Grading Policy -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Grading Policy</h2>
+                          <div class="space-y-3">
+                            <template x-for="g in courseDetail.syllabus?.grading || []" :key="g.label">
+                              <div class="flex items-center justify-between gap-4">
+                                <span class="text-sm text-slate-700" x-text="g.label"></span>
+                                <div class="flex items-center gap-2 w-40">
+                                  <div class="h-1.5 w-full rounded-full bg-sand-200 overflow-hidden">
+                                    <div class="h-full bg-rust-500" :style="`width:${g.weight || 0}%`"></div>
+                                  </div>
+                                  <span class="text-xs text-slate-600" x-text="(g.weight || 0) + '%'"></span>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+
+                        <!-- Instructor Info -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Instructor Information</h2>
+                          <div class="space-y-1 text-sm text-slate-700">
+                            <p>
+                              <span class="font-semibold">Name:</span>
+                              <span x-text="(courseDetail.syllabus && courseDetail.syllabus.instructor && courseDetail.syllabus.instructor.name) || courseDetail.instructorName"></span>
+                            </p>
+                            <p>
+                              <span class="font-semibold">Email:</span>
+                              <span x-text="courseDetail.syllabus?.instructor?.email || 'tba@university.edu'"></span>
+                            </p>
+                            <p>
+                              <span class="font-semibold">Office Hours:</span>
+                              <span x-text="courseDetail.syllabus?.instructor?.officeHours || courseDetail.officeHours"></span>
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Slides -->
+                    <div x-show="courseDetailTab === 'slides'" x-transition>
+                      <div class="space-y-3">
+                        <template x-if="!courseDetail.slides || !courseDetail.slides.length">
+                          <p class="text-sm text-slate-500">Slide decks will be posted as the course progresses.</p>
+                        </template>
+
+                        <template x-for="slide in courseDetail.slides || []" :key="slide.title">
+                          <div class="rounded-xl2 border border-sand-200 bg-white shadow-card px-4 py-3 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                              <div class="h-10 w-10 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700">
+                                📄
+                              </div>
+                              <div>
+                                <div class="font-medium text-sm text-slate-900" x-text="slide.title"></div>
+                                <div class="text-xs text-slate-500" x-text="(slide.pages || '') + (slide.pages && slide.date ? ' • ' : '') + (slide.date || '')"></div>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <button
+                                class="px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600"
+                                @click="openResource({
+                                  title: slide.title,
+                                  type: 'PDF slides',
+                                  pages: slide.pages,
+                                  date: slide.date,
+                                  size: slide.size,
+                                  url: slide.url
+                                })">
+                                View
+                              </button>
+                              <a
+                                :href="slide.url || '#'"
+                                download
+                                class="px-3 py-1.5 rounded-lg border border-rust-200 text-xs font-medium text-rust-700 hover:bg-sand-50">
+                                Download
+                              </a>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- Materials -->
+                    <div x-show="courseDetailTab === 'materials'" x-transition>
+                      <div class="space-y-3">
+                        <template x-if="!courseDetail.materials || !courseDetail.materials.length">
+                          <p class="text-sm text-slate-500">No additional materials have been uploaded yet.</p>
+                        </template>
+
+                        <template x-for="item in courseDetail.materials || []" :key="item.title">
+                          <div class="rounded-xl2 border border-sand-200 bg-white shadow-card px-4 py-3 flex items-center justify-between gap-4">
+                            <div class="flex items-center gap-3">
+                              <div class="h-10 w-10 rounded-xl flex items-center justify-center text-slate-700 bg-sand-200">
+                                <span class="text-lg"
+                                      x-text="item.type === 'VIDEO' ? '🎥' : (item.type === 'LINK' ? '🔗' : '📄')"></span>
+                              </div>
+                              <div>
+                                <div class="font-medium text-sm text-slate-900" x-text="item.title"></div>
+                                <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                                  <span class="px-2 py-0.5 rounded-full bg-sand-200 text-slate-700" x-text="item.type"></span>
+                                  <span x-text="item.meta"></span>
+                                  <span x-show="item.date">•</span>
+                                  <span x-text="item.date"></span>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="flex items-center gap-2">
+                              <!-- Internal resources: open fake viewer -->
+                              <template x-if="!item.isExternal">
+                                <button
+                                  class="px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600"
+                                  @click="openResource({
+                                    title: item.title,
+                                    type: item.type === 'VIDEO' ? 'Video' : 'PDF document',
+                                    pages: '',
+                                    date: item.date,
+                                    size: item.size,
+                                    url: item.url
+                                  })">
+                                  View
+                                </button>
+                              </template>
+
+                              <!-- External links -->
+                              <template x-if="item.isExternal">
+                                <a
+                                  :href="item.url"
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  class="px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600">
+                                  Open Link
+                                </a>
+                              </template>
+
+                              <a
+                                x-show="item.download"
+                                :href="item.url || '#'"
+                                download
+                                class="px-3 py-1.5 rounded-lg border border-rust-200 text-xs font-medium text-rust-700 hover:bg-sand-50">
+                                Download
+                              </a>
+                            </div>
+                          </div>
+                        </template>
+                      </div>
+                    </div>
+
+                    <!-- Important Dates -->
+                    <div x-show="courseDetailTab === 'dates'" x-transition>
+                      <div class="space-y-5">
+                        <!-- Upcoming Deadlines -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Upcoming Deadlines</h2>
+                          <template x-if="!courseDetail.datesUpcoming || !courseDetail.datesUpcoming.length">
+                            <p class="text-sm text-slate-500">No upcoming dates posted yet.</p>
+                          </template>
+                          <div class="space-y-3">
+                            <template x-for="d in courseDetail.datesUpcoming || []" :key="d.title">
+                              <div class="rounded-xl2 border border-sand-200 bg-white px-4 py-3 flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                  <div class="h-10 w-10 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700 text-lg">
+                                    <span x-show="d.kind==='assignment'">📄</span>
+                                    <span x-show="d.kind==='meeting'">👥</span>
+                                    <span x-show="d.kind==='presentation'">🎤</span>
+                                    <span x-show="d.kind==='exam'">⚠️</span>
+                                    <span x-show="!['assignment','meeting','presentation','exam'].includes(d.kind)">📌</span>
+                                  </div>
+                                  <div>
+                                    <div class="font-medium text-sm text-slate-900" x-text="d.title"></div>
+                                    <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                                      <span class="px-2 py-0.5 rounded-full bg-sand-100 text-slate-700 capitalize" x-text="d.kind || 'event'"></span>
+                                      <span x-text="d.date"></span>
+                                      <span x-show="d.time">•</span>
+                                      <span x-text="d.time"></span>
+                                      <span x-show="d.location">•</span>
+                                      <span x-text="d.location"></span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="text-xs text-slate-600" x-show="d.points">
+                                  <span class="font-semibold" x-text="'Points ' + d.points"></span>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+
+                        <!-- Complete Timeline -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Completed Work &amp; Past Deadlines</h2>
+                          <template x-if="!courseDetail.timeline || !courseDetail.timeline.length">
+                            <p class="text-sm text-slate-500">No completed work logged yet.</p>
+                          </template>
+                          <div class="space-y-3">
+                            <template x-for="t in courseDetail.timeline || []" :key="t.title">
+                              <div class="rounded-xl2 border border-sand-200 bg-white px-4 py-3 flex items-center justify-between gap-4">
+                                <div class="flex items-center gap-3">
+                                  <div class="h-10 w-10 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700 text-lg">
+                                    📄
+                                  </div>
+                                  <div>
+                                    <div class="font-medium text-sm text-slate-900" x-text="t.title"></div>
+                                    <div class="flex items-center gap-2 text-[11px] text-slate-500">
+                                      <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700" x-text="t.status || 'Completed'"></span>
+                                      <span class="px-2 py-0.5 rounded-full bg-sand-100 text-slate-700" x-text="t.kind || 'assignment'"></span>
+                                      <span x-text="t.date"></span>
+                                      <span>•</span>
+                                      <span x-text="t.time"></span>
+                                    </div>
+                                  </div>
+                                </div>
+                                <div class="text-xs text-slate-600" x-show="t.points">
+                                  <span class="font-semibold" x-text="'Points ' + t.points"></span>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Software & Tools -->
+                    <div x-show="courseDetailTab === 'tools'" x-transition>
+                      <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                        <h2 class="font-semibold text-lg mb-3 text-slate-900">Required Software &amp; Tools</h2>
+                        <p class="text-sm text-slate-600 mb-4">
+                          All software and tools required or recommended for this course. Click “Access Tool” to download or open.
+                        </p>
+
+                        <template x-if="!courseDetail.tools || !courseDetail.tools.length">
+                          <p class="text-sm text-slate-500">No tools have been listed yet.</p>
+                        </template>
+
+                        <div class="grid md:grid-cols-2 gap-4">
+                          <template x-for="tool in courseDetail.tools || []" :key="tool.name">
+                            <div class="rounded-xl2 border border-sand-200 bg-sand-50/70 p-4 flex flex-col gap-3">
+                              <div class="flex items-start gap-3">
+                                <div class="h-10 w-10 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700 text-lg">
+                                  <span x-text="tool.icon || '🛠'"></span>
+                                </div>
+                                <div>
+                                  <div class="font-semibold text-sm text-slate-900" x-text="tool.name"></div>
+                                  <div class="mt-1">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-sand-200 text-[11px] text-slate-700"
+                                          x-text="tool.tag || 'Tool'"></span>
+                                  </div>
+                                  <p class="text-xs text-slate-600 mt-2" x-text="tool.desc"></p>
+                                </div>
+                              </div>
+                              <a
+                                class="mt-1 w-full px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white text-center hover:bg-rust-600"
+                                :href="tool.url || '#'"
+                                target="_blank"
+                                rel="noopener noreferrer">
+                                Access Tool
+                              </a>
+                            </div>
+                          </template>
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Textbooks -->
+                    <div x-show="courseDetailTab === 'textbooks'" x-transition>
+                      <div class="space-y-5">
+                        <!-- Required -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Required Textbooks</h2>
+                          <template x-if="!courseDetail.textbooksRequired || !courseDetail.textbooksRequired.length">
+                            <p class="text-sm text-slate-500">No required textbooks listed for this course.</p>
+                          </template>
+                          <div class="space-y-4">
+                            <template x-for="book in courseDetail.textbooksRequired || []" :key="book.title">
+                              <div class="rounded-xl2 border border-sand-200 bg-sand-50/70 px-4 py-3 flex gap-4">
+                                <div class="h-12 w-12 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700 text-xl">
+                                  <span x-text="book.icon || '📘'"></span>
+                                </div>
+                                <div class="flex-1">
+                                  <div class="font-semibold text-sm text-slate-900" x-text="book.title"></div>
+                                  <div class="text-xs text-slate-600" x-text="book.subtitle"></div>
+                                  <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                                    <template x-for="(tag, idx) in book.tags || []" :key="idx">
+                                      <span class="px-2 py-0.5 rounded-full"
+                                            :class="
+                                              tag === 'Required'           ? 'bg-rust-500 text-white' :
+                                              tag.includes('Free')         ? 'bg-emerald-100 text-emerald-700' :
+                                              tag === 'Optional'           ? 'bg-sand-200 text-slate-700' :
+                                                                             'bg-sand-200 text-slate-700'
+                                            "
+                                            x-text="tag"></span>
+                                    </template>
+                                  </div>
+                                  <p class="text-xs text-slate-600 mt-2" x-text="book.description"></p>
+                                  <p class="text-[11px] text-slate-500 mt-1" x-show="book.isbn" x-text="'ISBN: ' + book.isbn"></p>
+                                  <div class="mt-3" x-show="book.link && book.link.url">
+                                    <a
+                                      :href="book.link.url"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      class="inline-block px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600"
+                                      x-text="book.link.label || 'More Info'">
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+
+                        <!-- Recommended -->
+                        <div class="rounded-xl2 border border-sand-200/70 bg-white shadow-card p-5 md:p-6">
+                          <h2 class="font-semibold text-lg mb-3 text-slate-900">Recommended Textbooks</h2>
+                          <template x-if="!courseDetail.textbooksRecommended || !courseDetail.textbooksRecommended.length">
+                            <p class="text-sm text-slate-500">No additional recommended books listed.</p>
+                          </template>
+                          <div class="space-y-4">
+                            <template x-for="book in courseDetail.textbooksRecommended || []" :key="book.title">
+                              <div class="rounded-xl2 border border-sand-200 bg-sand-50/70 px-4 py-3 flex gap-4">
+                                <div class="h-12 w-12 rounded-xl bg-sand-200 flex items-center justify-center text-slate-700 text-xl">
+                                  <span x-text="book.icon || '📙'"></span>
+                                </div>
+                                <div class="flex-1">
+                                  <div class="font-semibold text-sm text-slate-900" x-text="book.title"></div>
+                                  <div class="text-xs text-slate-600" x-text="book.subtitle"></div>
+                                  <div class="mt-2 flex flex-wrap gap-2 text-[11px]">
+                                    <template x-for="(tag, idx) in book.tags || []" :key="idx">
+                                      <span class="px-2 py-0.5 rounded-full bg-sand-200 text-slate-700" x-text="tag"></span>
+                                    </template>
+                                  </div>
+                                  <p class="text-xs text-slate-600 mt-2" x-text="book.description"></p>
+                                  <p class="text-[11px] text-slate-500 mt-1" x-show="book.isbn" x-text="'ISBN: ' + book.isbn"></p>
+                                  <div class="mt-3" x-show="book.link && book.link.url">
+                                    <a
+                                      :href="book.link.url"
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      class="inline-block px-3 py-1.5 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600"
+                                      x-text="book.link.label || 'More Info'">
+                                    </a>
+                                  </div>
+                                </div>
+                              </div>
+                            </template>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div> <!-- end tab panels wrapper -->
+              </section>
+
+              <!-- Right column: announcements & activity -->
+              <aside class="space-y-4">
+                <!-- Announcements -->
+                <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5">
+                  <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-semibold text-slate-900">Latest announcements</h2>
+                    <span class="text-[11px] text-slate-500" x-text="courseDetail.announcements?.length ? courseDetail.announcements.length + ' updates' : 'No new updates'"></span>
+                  </div>
+                  <div class="space-y-3" x-show="courseDetail.announcements && courseDetail.announcements.length">
+                    <template x-for="a in courseDetail.announcements" :key="a.id">
+                      <div class="rounded-xl border border-sand-200 px-3 py-2.5">
+                        <div class="flex items-center justify-between gap-2 mb-0.5">
+                          <div class="text-xs font-semibold text-slate-900" x-text="a.title"></div>
+                          <span
+                            class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px]"
+                            :class="a.priority === 'high'
+                              ? 'bg-rust-100 text-rust-800'
+                              : 'bg-sand-100 text-slate-700'"
+                            x-text="a.priority === 'high' ? 'Important' : 'Update'">
+                          </span>
+                        </div>
+                        <p class="text-[11px] text-slate-600 mb-1" x-text="a.body"></p>
+                        <div class="flex items-center gap-2 text-[10px] text-slate-500">
+                          <span x-text="a.date"></span>
+                          <span>·</span>
+                          <span x-text="a.time"></span>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+                  <p class="text-xs text-slate-500" x-show="!courseDetail.announcements || !courseDetail.announcements.length">
+                    No announcements yet for this course.
+                  </p>
+                </div>
+
+                <!-- Quick actions -->
+                <div class="rounded-xl2 bg-sand-25 border border-sand-200/80 shadow-card p-4 md:p-5 space-y-3">
+                  <h2 class="text-sm font-semibold text-slate-900">Quick actions</h2>
+                  <div class="space-y-2.5 text-xs">
+                    <button class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-sand-200 bg-white hover:bg-sand-50">
+                      <div class="flex items-center gap-2">
+                        <span>⬇️</span>
+                        <span>Download full syllabus</span>
+                      </div>
+                      <span class="text-slate-500">PDF</span>
+                    </button>
+                    <button class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-sand-200 bg-white hover:bg-sand-50">
+                      <div class="flex items-center gap-2">
+                        <span>💬</span>
+                        <span>Ask a question on the forum</span>
+                      </div>
+                      <span class="text-slate-500">CS 401</span>
+                    </button>
+                    <button class="w-full flex items-center justify-between gap-2 px-3 py-2 rounded-xl border border-sand-200 bg-white hover:bg-sand-50">
+                      <div class="flex items-center gap-2">
+                        <span>📧</span>
+                        <span>Email the instructor</span>
+                      </div>
+                      <span class="text-slate-500">Outlook</span>
+                    </button>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= ASSIGNMENTS TAB ================= -->
+        <section x-show="page === 'assignments'" x-cloak>
+          <!-- BRANCH: assignments-tab -->
+          <div class="p-4 md:p-6 max-w-6xl mx-auto space-y-4">
+            <div class="flex items-center justify-between gap-3 mb-2">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">Assignments & tasks</h1>
+                <p class="text-xs text-slate-500">Upcoming and completed work across all courses.</p>
+              </div>
+              <button class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                Filter: This week
+              </button>
+            </div>
+
+            <div class="grid lg:grid-cols-[minmax(0,1.6fr),minmax(0,1.1fr)] gap-5 items-start">
+              <!-- Left: assignments list -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5">
+                <div class="flex items-center justify-between mb-3">
+                  <h2 class="text-sm font-semibold text-slate-900">This week</h2>
+                  <span class="text-[11px] text-slate-500">4 items due</span>
+                </div>
+                <div class="space-y-3">
+                  <template x-for="item in assignmentsThisWeek" :key="item.title">
+                    <div class="rounded-xl border border-sand-200 px-3 py-2.5 flex items-center justify-between gap-3">
+                      <div class="flex items-center gap-3">
+                        <div class="h-9 w-9 rounded-xl bg-sand-100 flex items-center justify-center text-lg">
+                          <span x-text="item.icon"></span>
+                        </div>
+                        <div>
+                          <div class="text-xs font-semibold text-slate-900" x-text="item.title"></div>
+                          <div class="text-[11px] text-slate-500" x-text="item.course"></div>
+                        </div>
+                      </div>
+                      <div class="text-right text-[11px] text-slate-500">
+                        <div x-text="item.due"></div>
+                        <div x-text="item.weight"></div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+              <!-- Right: summary -->
+              <div class="space-y-4">
+                <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5">
+                  <h2 class="text-sm font-semibold text-slate-900 mb-3">Completion overview</h2>
+                  <div class="space-y-2 text-xs text-slate-600">
+                    <div class="flex items-center justify-between gap-2">
+                      <span>CS 401 · Advanced Web Dev</span>
+                      <span>6 / 8 tasks</span>
+                    </div>
+                    <div class="h-1.5 rounded-full bg-sand-100 overflow-hidden">
+                      <div class="h-full bg-rust-500" style="width:75%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 mt-2">
+                      <span>CS 350 · Data Structures</span>
+                      <span>5 / 7 tasks</span>
+                    </div>
+                    <div class="h-1.5 rounded-full bg-sand-100 overflow-hidden">
+                      <div class="h-full bg-rust-500" style="width:71%"></div>
+                    </div>
+
+                    <div class="flex items-center justify-between gap-2 mt-2">
+                      <span>MATH 201 · Linear Algebra</span>
+                      <span>4 / 6 tasks</span>
+                    </div>
+                    <div class="h-1.5 rounded-full bg-sand-100 overflow-hidden">
+                      <div class="h-full bg-rust-500" style="width:67%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="rounded-xl2 bg-sand-25 border border-sand-200/80 shadow-card p-4 md:p-5">
+                  <h2 class="text-sm font-semibold text-slate-900 mb-2">Focus tip</h2>
+                  <p class="text-xs text-slate-600">
+                    Try a <span class="font-semibold">25-minute focus block</span> for CS 401 Project work,
+                    followed by a 5-minute break. Repeat 3× and then switch to MATH 201 problem sets.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= QUIZ BUILDER TAB ================= -->
+        <section x-show="page === 'quiz'" x-cloak>
+          <!-- BRANCH: quiz-tab -->
+          <div class="p-4 md:p-6 max-w-5xl mx-auto space-y-5">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">Quiz Builder</h1>
+                <p class="text-xs text-slate-500">
+                  Select a course and lecture topics. We’ll generate practice questions to help you revise.
+                </p>
+              </div>
+              <button
+                class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                Beta · CS 401 + CS 350
+              </button>
+            </div>
+
+            <div class="grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1.1fr)] gap-5 items-start">
+              <!-- Left: configuration -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-4">
+                <div>
+                  <label class="text-xs font-medium text-slate-700">Course</label>
+                  <select
+                    x-model="quiz.course"
+                    class="mt-1 w-full text-xs border border-sand-200 rounded-xl px-3 py-2 bg-sand-25 focus:outline-none focus:ring-1 focus:ring-rust-400 focus:border-rust-400">
+                    <option value="CS 401">CS 401 · Advanced Web Development</option>
+                    <option value="CS 350">CS 350 · Data Structures & Algorithms</option>
+                  </select>
+                </div>
+
+                <div>
+                  <div class="flex items-center justify-between mb-1">
+                    <label class="text-xs font-medium text-slate-700">Pick lecture topics</label>
+                    <span class="text-[11px] text-slate-500" x-text="quiz.lectures.length + ' selected'"></span>
+                  </div>
+                  <div class="grid grid-cols-2 gap-2 text-xs">
+                    <template x-for="lec in lecturesByCode(quiz.course === 'CS 401' ? 'CS 401' : 'CS 350')" :key="lec.id">
+                      <button
+                        type="button"
+                        @click="toggleQuizLecture(lec.id)"
+                        class="px-2.5 py-1.5 rounded-xl border text-left transition"
+                        :class="quiz.lectures.includes(lec.id)
+                          ? 'border-rust-400 bg-rust-50 text-rust-900'
+                          : 'border-sand-200 bg-sand-25 text-slate-700 hover:bg-white'">
+                        <div class="font-medium text-[11px]" x-text="lec.label"></div>
+                        <div class="text-[10px] text-slate-500" x-text="lec.topic"></div>
+                      </button>
+                    </template>
+                  </div>
+                </div>
+
+                <div class="flex items-center justify-between gap-3 pt-2">
+                  <div class="text-[11px] text-slate-500">
+                    Approx. <span class="font-semibold" x-text="Math.max(quiz.lectures.length*3, 3)"></span> questions
+                  </div>
+                  <button
+                    @click="generateQuiz()"
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rust-500 text-xs font-medium text-white hover:bg-rust-600">
+                    <span>Generate quiz</span>
+                    <span>✨</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right: output -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-3">
+                <div class="flex items-center justify-between">
+                  <h2 class="text-sm font-semibold text-slate-900">Quiz preview</h2>
+                  <span class="text-[11px] text-slate-500" x-text="quizOut.length + ' questions'"></span>
+                </div>
+                <div class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                  <template x-if="!quizOut.length">
+                    <p class="text-xs text-slate-500">
+                      Choose a course and topics, then click <span class="font-semibold">Generate quiz</span> to see practice questions here.
+                    </p>
+                  </template>
+                  <template x-for="(q, idx) in quizOut" :key="idx">
+                    <div class="rounded-xl border border-sand-200 px-3 py-2.5 text-xs">
+                      <div class="flex items-start gap-2">
+                        <span class="mt-0.5 text-slate-400" x-text="(idx+1) + '.'"></span>
+                        <div>
+                          <div class="font-medium text-slate-900" x-text="q.question"></div>
+                          <ul class="mt-1 list-disc pl-4 space-y-0.5 text-slate-700">
+                            <template x-for="(a, i2) in q.options" :key="i2">
+                              <li x-text="a"></li>
+                            </template>
+                          </ul>
+                          <details class="mt-1 text-[11px] text-slate-600">
+                            <summary class="cursor-pointer">Show answer</summary>
+                            <div class="mt-0.5" x-text="'Answer: ' + q.answer"></div>
+                          </details>
+                        </div>
+                      </div>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= AI ASSISTANT TAB ================= -->
+        <section x-show="page === 'ai'" x-cloak>
+          <!-- BRANCH: ai-assistant-tab -->
+          <div class="p-4 md:p-6 max-w-5xl mx-auto space-y-4">
+            <div class="flex items-center justify-between gap-3 mb-1">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">AI Study Assistant</h1>
+                <p class="text-xs text-slate-500">
+                  Ask questions about your courses. This is a static prototype wired to CS 401, CS 350, and MATH 201.
+                </p>
+              </div>
+              <button class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                Mode: Study help
+              </button>
+            </div>
+
+            <div class="grid md:grid-cols-[minmax(0,1.4fr),minmax(0,1.1fr)] gap-5">
+              <!-- Left: fake chat -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 flex flex-col gap-3 max-h-[480px]">
+                <div class="flex-1 overflow-y-auto pr-1 space-y-3 text-xs">
+                  <div class="flex items-start gap-2">
+                    <div class="h-7 w-7 rounded-full bg-sand-100 flex items-center justify-center text-sm">👩🏻‍💻</div>
+                    <div class="rounded-2xl bg-sand-50 px-3 py-2 max-w-[80%]">
+                      <p class="text-slate-800">
+                        I have a quiz on <span class="font-semibold">eigenvalues &amp; eigenvectors</span> for MATH 201.
+                        Can you explain the main idea and give me a quick example?
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-2">
+                    <div class="h-7 w-7 rounded-full bg-rust-500 flex items-center justify-center text-xs text-white">AI</div>
+                    <div class="rounded-2xl bg-sand-25 px-3 py-2 max-w-[80%]">
+                      <p class="text-slate-800 mb-1">
+                        Sure! In <span class="font-semibold">MATH 201 · Linear Algebra</span>, eigenvalues and eigenvectors describe how a linear transformation
+                        stretches or flips space along special directions.
+                      </p>
+                      <ul class="list-disc pl-4 text-slate-800 space-y-0.5">
+                        <li>An <span class="font-semibold">eigenvector</span> is a non-zero vector whose direction doesn’t change after applying the matrix.</li>
+                        <li>The corresponding <span class="font-semibold">eigenvalue</span> is the factor by which the eigenvector is stretched or compressed.</li>
+                      </ul>
+                      <p class="mt-1 text-slate-800">
+                        For example, if \( A v = 3 v \), then \( v \) is an eigenvector of \( A \) with eigenvalue 3.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div class="flex items-start gap-2">
+                    <div class="h-7 w-7 rounded-full bg-rust-500 flex items-center justify-center text-xs text-white">AI</div>
+                    <div class="rounded-2xl bg-sand-25 px-3 py-2 max-w-[80%]">
+                      <p class="text-slate-800">
+                        Based on the current week in <span class="font-semibold">CS 401</span>, I’d also suggest reviewing
+                        the slides <span class="font-semibold">“Week 5: API Integration &amp; Data Fetching”</span> if you’re working
+                        on your web dev project.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="border-t border-sand-200 pt-2 mt-2">
+                  <div class="flex items-center gap-2 text-[11px] text-slate-500 mb-1">
+                    <span class="h-5 w-5 rounded-full bg-sand-100 flex items-center justify-center text-xs">✨</span>
+                    <span>In a real build, this panel would connect to your course content and LLM backend.</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input
+                      type="text"
+                      disabled
+                      class="flex-1 text-xs px-3 py-2 rounded-xl border border-sand-200 bg-sand-25 text-slate-500"
+                      value="Ask about CS 401, CS 350, or MATH 201… (demo only)" />
+                    <button class="px-3 py-2 rounded-xl bg-sand-200 text-[11px] text-slate-700 font-medium">
+                      Send
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Right: course chips -->
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-3 text-xs">
+                <h2 class="text-sm font-semibold text-slate-900 mb-1">Linked courses</h2>
+                <p class="text-slate-600 mb-2">
+                  These are the same three courses from your dashboard and cards, so everything stays consistent.
+                </p>
+
+                <div class="space-y-2">
+                  <div class="rounded-xl border border-sand-200 px-3 py-2 flex items-center justify-between gap-2">
+                    <div>
+                      <div class="font-semibold text-slate-900">CS 401 · Advanced Web Development</div>
+                      <div class="text-[11px] text-slate-500">Modules: React, APIs, state management, deployment</div>
+                    </div>
+                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-sand-100 text-slate-700">Primary</span>
+                  </div>
+                  <div class="rounded-xl border border-sand-200 px-3 py-2 flex items-center justify-between gap-2">
+                    <div>
+                      <div class="font-semibold text-slate-900">CS 350 · Data Structures &amp; Algorithms</div>
+                      <div class="text-[11px] text-slate-500">Arrays, trees, graphs, complexity, heaps, hashing</div>
+                    </div>
+                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-sand-100 text-slate-700">Problem-solving</span>
+                  </div>
+                  <div class="rounded-xl border border-sand-200 px-3 py-2 flex items-center justify-between gap-2">
+                    <div>
+                      <div class="font-semibold text-slate-900">MATH 201 · Linear Algebra</div>
+                      <div class="text-[11px] text-slate-500">Systems, matrices, vector spaces, eigenvalues</div>
+                    </div>
+                    <span class="text-[11px] px-2 py-0.5 rounded-full bg-sand-100 text-slate-700">Theory</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= PROFILE TAB ================= -->
+        <section x-show="page === 'profile'" x-cloak>
+          <!-- BRANCH: profile-tab -->
+          <div class="p-4 md:p-6 max-w-4xl mx-auto space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">Profile</h1>
+                <p class="text-xs text-slate-500">Student profile synced with your courses in Ignite LMS.</p>
+              </div>
+              <button
+                @click="editingProfile = !editingProfile"
+                class="px-3 py-1.5 rounded-full border border-sand-200 text-xs text-slate-700 bg-white hover:bg-sand-50">
+                <span x-show="!editingProfile">Edit profile</span>
+                <span x-show="editingProfile">Cancel</span>
+              </button>
+            </div>
+
+            <div class="grid md:grid-cols-[minmax(0,1.3fr),minmax(0,1fr)] gap-5 items-start">
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-4">
+                <div class="flex items-center gap-3">
+                  <div class="h-12 w-12 rounded-2xl bg-sand-100 flex items-center justify-center text-2xl">
+                    👩🏻‍💻
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-900" x-text="profile.name"></div>
+                    <div class="text-[11px] text-slate-500" x-text="profile.program"></div>
+                  </div>
+                </div>
+
+                <div class="border-t border-sand-200 pt-4 mt-3 space-y-3 text-xs">
+                  <div class="flex flex-col gap-1">
+                    <label class="font-medium text-slate-700">Email</label>
+                    <template x-if="!editingProfile">
+                      <p class="text-slate-700" x-text="profile.email"></p>
+                    </template>
+                    <template x-if="editingProfile">
+                      <input
+                        type="email"
+                        x-model="profile.email"
+                        class="text-xs px-3 py-2 rounded-xl border border-sand-200 bg-sand-25 focus:outline-none focus:ring-1 focus:ring-rust-400 focus:border-rust-400" />
+                    </template>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <label class="font-medium text-slate-700">Program &amp; cohort</label>
+                    <template x-if="!editingProfile">
+                      <p class="text-slate-700" x-text="profile.program"></p>
+                    </template>
+                    <template x-if="editingProfile">
+                      <input
+                        type="text"
+                        x-model="profile.program"
+                        class="text-xs px-3 py-2 rounded-xl border border-sand-200 bg-sand-25 focus:outline-none focus:ring-1 focus:ring-rust-400 focus:border-rust-400" />
+                    </template>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <label class="font-medium text-slate-700">Focus courses</label>
+                    <template x-if="!editingProfile">
+                      <p class="text-slate-700" x-text="profile.focusCourses"></p>
+                    </template>
+                    <template x-if="editingProfile">
+                      <input
+                        type="text"
+                        x-model="profile.focusCourses"
+                        class="text-xs px-3 py-2 rounded-xl border border-sand-200 bg-sand-25 focus:outline-none focus:ring-1 focus:ring-rust-400 focus:border-rust-400" />
+                    </template>
+                  </div>
+
+                  <div class="flex flex-col gap-1">
+                    <label class="font-medium text-slate-700">Bio</label>
+                    <template x-if="!editingProfile">
+                      <p class="text-slate-700" x-text="profile.bio"></p>
+                    </template>
+                    <template x-if="editingProfile">
+                      <textarea
+                        rows="3"
+                        x-model="profile.bio"
+                        class="text-xs px-3 py-2 rounded-xl border border-sand-200 bg-sand-25 focus:outline-none focus:ring-1 focus:ring-rust-400 focus:border-rust-400"></textarea>
+                    </template>
+                  </div>
+
+                  <div class="pt-2" x-show="editingProfile">
+                    <button
+                      @click="saveProfile()"
+                      class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-rust-500 text-xs font-medium text-white hover:bg-rust-600">
+                      Save changes
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div class="space-y-4">
+                <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 text-xs">
+                  <h2 class="text-sm font-semibold text-slate-900 mb-2">Linked accounts</h2>
+                  <ul class="space-y-2">
+                    <li class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <span>🎓</span>
+                        <span>Goodman LMS</span>
+                      </div>
+                      <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px]">Connected</span>
+                    </li>
+                    <li class="flex items-center justify-between gap-2">
+                      <div class="flex items-center gap-2">
+                        <span>📧</span>
+                        <span>Brock email</span>
+                      </div>
+                      <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px]">Connected</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="rounded-xl2 bg-sand-25 border border-sand-200/80 shadow-card p-4 md:p-5 text-xs">
+                  <h2 class="text-sm font-semibold text-slate-900 mb-2">Study preferences</h2>
+                  <p class="text-slate-600">
+                    Evening study blocks · pastel UI · prefers summaries first, then details. Perfect match for
+                    Vibe Coding ✨
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= SETTINGS TAB ================= -->
+        <section x-show="page === 'settings'" x-cloak>
+          <!-- BRANCH: settings-tab -->
+          <div class="p-4 md:p-6 max-w-4xl mx-auto space-y-4">
+            <div class="flex items-center justify-between gap-3">
+              <div>
+                <h1 class="text-lg md:text-xl font-semibold text-slate-900">Settings</h1>
+                <p class="text-xs text-slate-500">Prototype-only preferences for Ignite LMS.</p>
+              </div>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-4 items-start">
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-3 text-xs">
+                <h2 class="text-sm font-semibold text-slate-900">Theme &amp; layout</h2>
+                <div class="flex items-center justify-between">
+                  <span>Color theme</span>
+                  <span class="px-2 py-0.5 rounded-full bg-sand-100 text-slate-700 text-[11px]">Pastel sand + rust</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Layout density</span>
+                  <span class="px-2 py-0.5 rounded-full bg-sand-100 text-slate-700 text-[11px]">Comfortable</span>
+                </div>
+              </div>
+
+              <div class="rounded-xl2 bg-white border border-sand-200/80 shadow-card p-4 md:p-5 space-y-3 text-xs">
+                <h2 class="text-sm font-semibold text-slate-900">Notifications</h2>
+                <div class="flex items-center justify-between">
+                  <span>Upcoming deadlines</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px]">Enabled</span>
+                </div>
+                <div class="flex items-center justify-between">
+                  <span>Course announcements</span>
+                  <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-700 text-[11px]">Enabled</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========= Fake PDF / Resource modal ========= -->
+        <div
+          x-show="resourceModalOpen"
+          x-cloak
+          @keydown.escape.window="closeResource()"
+          class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40">
+          <div
+            @click.outside="closeResource()"
+            class="bg-white rounded-2xl shadow-xl max-w-3xl w-full mx-4 overflow-hidden">
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-4 border-b border-sand-200">
+              <div>
+                <div class="text-sm font-semibold text-slate-900" x-text="resourceModal.title"></div>
+                <div class="text-xs text-slate-500" x-text="resourceModal.type"></div>
+              </div>
+              <button
+                class="text-slate-500 hover:text-slate-700 text-lg"
+                @click="closeResource()">
+                ✕
+              </button>
+            </div>
+
+            <!-- Body -->
+            <div class="px-5 py-4 space-y-4">
+              <div class="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                <span x-text="resourceModal.pages"></span>
+                <span x-show="resourceModal.pages && resourceModal.date">•</span>
+                <span x-text="resourceModal.date"></span>
+                <span x-show="(resourceModal.pages || resourceModal.date) && resourceModal.size">•</span>
+                <span x-text="resourceModal.size"></span>
+              </div>
+
+              <!-- Fake PDF page -->
+              <div class="border border-sand-200 rounded-xl bg-sand-50 h-80 flex items-center justify-center text-slate-400 text-sm">
+                <span>Preview not available in this demo. Use “Download file” to open the full document.</span>
+              </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="px-5 py-4 border-t border-sand-200 flex items-center justify-between gap-3">
+              <a
+                :href="resourceModal.url || '#'"
+                download
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-rust-500 text-xs font-medium text-white hover:bg-rust-600">
+                Download file
+              </a>
+              <button
+                class="px-4 py-2 rounded-lg border border-sand-200 text-xs font-medium text-slate-700 hover:bg-sand-50"
+                @click="closeResource()">
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- =============== APP STATE (Alpine) =============== -->
+  <script>
+    /* ===========================================================
+   IGNITE LMS — DATA MODEL REFERENCE (Student LMS only for now)
+   -----------------------------------------------------------
+   This does NOT change visuals. It just explains data shapes.
+   ===========================================================
+
+   STORAGE KEYS (auto-scoped per role):
+   ignite_student_profile
+   ignite_student_courses
+   ignite_student_assignments
+   ignite_student_submissions
+   ignite_student_grades
+   ignite_student_quizzes
+   ignite_student_ai_summaries
+
+   NOTES:
+   - userRole is used to scope keys and (later) gate professor features.
+   - getStoreKey(key) automatically prefixes with ignite_[role]_.
+   - profile{} is persisted; courses/assignments/etc. can be wired later.
+   - For now, all data is static/sample, but shaped like "real" LMS data.
+
+   SHAPE OVERVIEW:
+   - profile: {
+       firstName,lastName,email,program,year,major,avatarUrl,timezone,notifications,preferredView
+     }
+
+   - courseCards[] (dashboard cards summary)
+   - courseDetails{} keyed by course id (1,2,3...) drives course detail page:
+       {id,code,title,instructorName,schedule,location,officeHours,
+        pinned[],announcements[],syllabus,slides[],materials[],
+        datesUpcoming[],timeline[],tools[],textbooksRequired[],textbooksRecommended[]}
+
+   - assignments[] → assignments-tab (future)
+   - grades[] → grades-tab
+   - aiSummaries{} → ai-assistant-tab
+   - profile{} → profile-settings
+
+   Shared helper methods:
+   - getStoreKey(key) → "ignite_student_profile" etc.
+   - saveProfile()
+   =========================================================== */
+
+    function app(){
+      return {
+        /* ===== Role & feature gates (Student-only today) ===== */
+        userRole: localStorage.getItem('ignite_role') || 'student',      // 'student' | 'professor'
+        get isStudent(){ return this.userRole === 'student'; },
+        get isProfessor(){ return this.userRole === 'professor'; },
+        setRole(role){                                                    // keep for later when you add a login/role switch
+          this.userRole = role;
+          localStorage.setItem('ignite_role', role);
+          // If you eventually diverge routes per role, you could reset page here.
+          // this.page = this.isStudent ? 'dashboard' : 'prof-dashboard';
+        },
+        features: {                                                       // flip to true as you add professor pages later
+          professorLMS: false
+        },
+
+        /* ===== Helper: scoped storage key ===== */
+        getStoreKey(key){
+          return `ignite_${this.userRole}_${key}`;
+        },
+
+        /* ===== UI state ===== */
+        sidebarOpen: false,
+        page: 'dashboard',                                                // 'dashboard' | 'courses' | 'assignments' | 'course' | 'ai' | 'profile' | 'settings'
+
+        /* ===== Profile (role-scoped storage) ===== */
+        profile: JSON.parse(
+          localStorage.getItem(
+            `ignite_${(localStorage.getItem('ignite_role') || 'student')}_profile`
+          ) || '{"firstName":"Sarah","lastName":"Johnson","email":"sarahj@university.edu","program":"BSc Computer Science","year":"3","major":"Software Engineering","avatarUrl":"","timezone":"America/Toronto","notifications":true,"preferredView":"compact"}'
+        ),
+        saveProfile(){
+          localStorage.setItem(this.getStoreKey('profile'), JSON.stringify(this.profile));
+        },
+
+        /* ===== Dashboard content (student sample data) ===== */
+        news: [
+          {
+            id: 1,
+            title: 'New Computer Science Lab Opens on Campus',
+            tag: 'Campus',
+            body: 'The CS department has opened a new lab with cutting-edge technology and collaborative workspaces for students.'
+          },
+          {
+            id: 2,
+            title: 'Spring 2026 Registration Now Open',
+            tag: 'Registrar',
+            body: 'You can now plan and register for your Spring 2026 semester courses. Priority registration ends November 1st.'
+          },
+          {
+            id: 3,
+            title: 'Career Fair Success: 500+ Students Connected',
+            tag: 'Careers',
+            body: 'The annual tech career fair connected over 500 students with leading technology companies.'
+          }
+        ],
+        important: [
+          { id: 1, title: 'Data Structures Quiz',    when: 'Nov 10 • 10:30 AM' },
+          { id: 2, title: 'Linear Algebra Midterm', when: 'Nov 15 • 1:00 PM'   },
+          { id: 3, title: 'Project Teams Due',      when: 'Nov 20 • 11:59 PM'  }
+        ],
+
+        /* ===== Mini calendar (simplified) ===== */
+        today: new Date(),
+        miniWeeks: [],
+        initMiniCalendar(){
+          const d = new Date(this.today);
+          d.setDate(1);
+          const firstDay = d.getDay(); // 0-6
+          const daysInMonth = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+          const weeks = [];
+          let current = [];
+          // padding for first week
+          for(let i=0;i<firstDay;i++){
+            current.push(null);
+          }
+          for(let day=1;day<=daysInMonth;day++){
+            if(current.length === 7){
+              weeks.push(current);
+              current = [];
+            }
+            current.push(new Date(d.getFullYear(), d.getMonth(), day));
+          }
+          if(current.length){
+            while(current.length<7) current.push(null);
+            weeks.push(current);
+          }
+          this.miniWeeks = weeks;
+        },
+        isToday(date){
+          if(!date) return false;
+          const t = this.today;
+          return date.getFullYear()===t.getFullYear()
+            && date.getMonth()===t.getMonth()
+            && date.getDate()===t.getDate();
+        },
+
+        /* ===== Courses (student view data) ===== */
+        courseCards: [
+          {
+            id: 1,
+            title: 'Advanced Web Development',
+            instructor: 'Dr. Emily Chen',
+            modules: 12,
+            students: '45',
+            next: 'Oct 21, 10:00 AM',
+            image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=1600&auto=format&fit=crop'
+          },
+          {
+            id: 2,
+            title: 'Data Structures & Algorithms',
+            instructor: 'Prof. Michael Zhang',
+            modules: 15,
+            students: '60',
+            next: 'Oct 22, 2:00 PM',
+            image: 'https://images.unsplash.com/photo-1515879218367-8466d910aaa4?q=80&w=1600&auto=format&fit=crop'
+          },
+          {
+            id: 3,
+            title: 'Linear Algebra',
+            instructor: 'Dr. Sarah Johnson',
+            modules: 10,
+            students: '38',
+            next: 'Oct 23, 11:00 AM',
+            image: 'https://images.unsplash.com/photo-1529101091764-c3526daf38fe?q=80&w=1600&auto=format&fit=crop'
+          }
+        ],
+
+        /* Detailed per-course data that drives the Course Detail page */
+        courseDetails: {
+          1: {
+            id: 1,
+            code: 'CS 401',
+            title: 'Advanced Web Development',
+            instructorName: 'Dr. Emily Chen',
+            schedule: 'Mon & Wed, 10:00 AM – 11:30 AM',
+            location: 'Room 301, CS Building',
+            officeHours: 'Tue & Thu, 2:00 PM – 4:00 PM',
+            pinned: [1, 2, 3],
+            announcements: [
+              {
+                id: 1,
+                title: 'Welcome to Advanced Web Development!',
+                body: 'Welcome everyone! Please review the syllabus and set up your dev environment before our first class.',
+                priority: 'high',
+                date: 'Sept 1, 2025',
+                time: '9:00 AM'
+              },
+              {
+                id: 2,
+                title: 'Project Teams Formation Deadline',
+                body: 'Reminder: Team formation is due by Sept 20th. Use the discussion board to find teammates (3–4 members).',
+                priority: 'high',
+                date: 'Sept 15, 2025',
+                time: '2:30 PM'
+              },
+              {
+                id: 3,
+                title: 'Office Hours Update',
+                body: 'Office hours moved to Wednesday 3–5 PM due to a faculty meeting.',
+                priority: 'medium',
+                date: 'Oct 1, 2025',
+                time: '11:15 AM'
+              }
+            ],
+            syllabus: {
+              description: 'This course covers advanced topics in modern web development including React, state management, API integration, and deployment strategies. You will build full-stack applications using industry-standard tools.',
+              objectives: [
+                'Master React and modern JavaScript patterns.',
+                'Implement RESTful APIs and integrate external services.',
+                'Use state management (Context, Redux) in larger apps.',
+                'Deploy and monitor production web applications.',
+                'Apply security and accessibility best practices.'
+              ],
+              grading: [
+                { label: 'Projects',       weight: 40 },
+                { label: 'Assignments',    weight: 25 },
+                { label: 'Midterm Exam',   weight: 15 },
+                { label: 'Final Exam',     weight: 20 }
+              ],
+              instructor: {
+                name: 'Dr. Emily Chen',
+                email: 'emily.chen@university.edu',
+                officeHours: 'Tue & Thu, 2:00 PM – 4:00 PM'
+              }
+            },
+            slides: [
+              { title: 'Week 1: Introduction to Modern Web Development', pages: '45 pages', date: 'Uploaded Sept 5, 2025',  size: '2.4 MB', url: '/files/webdev-week1-intro.pdf' },
+              { title: 'Week 2: React Fundamentals',                     pages: '52 pages', date: 'Uploaded Sept 12, 2025', size: '3.1 MB', url: '/files/webdev-week2-react-fundamentals.pdf' },
+              { title: 'Week 3: Component Architecture & State',         pages: '48 pages', date: 'Uploaded Sept 19, 2025', size: '2.8 MB', url: '/files/webdev-week3-components-state.pdf' },
+              { title: 'Week 4: Hooks and Advanced Patterns',            pages: '55 pages', date: 'Uploaded Sept 26, 2025', size: '3.5 MB', url: '/files/webdev-week4-hooks.pdf' },
+              { title: 'Week 5: API Integration & Data Fetching',        pages: '50 pages', date: 'Uploaded Oct 3, 2025',   size: '3.0 MB', url: '/files/webdev-week5-api.pdf' },
+              { title: 'Week 6: State Management with Redux',            pages: '60 pages', date: 'Uploaded Oct 10, 2025',  size: '3.8 MB', url: '/files/webdev-week6-redux.pdf' },
+              { title: 'Week 7: Authentication & Security',              pages: '42 pages', date: 'Uploaded Oct 17, 2025',  size: '2.2 MB', url: '/files/webdev-week7-auth.pdf' }
+            ],
+            materials: [
+              { title: 'Course Syllabus',          type: 'PDF',   meta: '245 KB',    size: '245 KB',  date: 'Added Sept 1, 2025',  download: true,  isExternal: false, url: '/files/webdev-syllabus.pdf' },
+              { title: 'Project Guidelines',       type: 'PDF',   meta: '180 KB',    size: '180 KB',  date: 'Added Sept 5, 2025',  download: true,  isExternal: false, url: '/files/webdev-project-guidelines.pdf' },
+              { title: 'React Official Docs',      type: 'LINK',  meta: 'External',  size: '',        date: 'Added Sept 5, 2025',  download: false, isExternal: true,  url: 'https://react.dev/' },
+              { title: 'API Integration Demo',     type: 'VIDEO', meta: '45 min',    size: '45 min',  date: 'Added Oct 1, 2025',   download: false, isExternal: false, url: '/files/webdev-api-demo.mp4' },
+              { title: 'Midterm Study Guide',      type: 'PDF',   meta: '320 KB',    size: '320 KB',  date: 'Added Oct 10, 2025',  download: true,  isExternal: false, url: '/files/webdev-midterm-guide.pdf' },
+              { title: 'Code Examples Repository', type: 'LINK',  meta: 'GitHub',    size: '',        date: 'Added Sept 5, 2025',  download: false, isExternal: true,  url: 'https://github.com/' }
+            ],
+            datesUpcoming: [
+              { title: 'Database Design Project',        kind: 'assignment',   date: 'Oct 22, 2025', time: '11:59 PM',            location: '',            points: '100' },
+              { title: 'Team Meeting - Progress Check',  kind: 'meeting',      date: 'Oct 24, 2025', time: '3:00 PM',             location: 'Study Room B', points: ''    },
+              { title: 'Assignment 3: API Integration',  kind: 'assignment',   date: 'Oct 29, 2025', time: '11:59 PM',            location: '',            points: '75'  },
+              { title: 'Project Presentation',           kind: 'presentation', date: 'Nov 5, 2025',  time: '10:00 AM',            location: '',            points: '150' },
+              { title: 'Final Exam',                     kind: 'exam',         date: 'Dec 10, 2025', time: '2:00 PM – 4:00 PM',   location: '',            points: '150' }
+            ],
+            timeline: [
+              { title: 'Assignment 1: React Components', status: 'Completed', kind: 'assignment', date: 'Sept 15, 2025', time: '11:59 PM', points: '50' },
+              { title: 'Assignment 2: State Management', status: 'Completed', kind: 'assignment', date: 'Sept 22, 2025', time: '11:59 PM', points: '50' },
+              { title: 'Project Proposal Due',           status: 'Completed', kind: 'assignment', date: 'Sept 29, 2025', time: '11:59 PM', points: '25' }
+            ],
+            tools: [
+              { name: 'Visual Studio Code', tag: 'Development Environment', desc: 'Primary code editor for web development.',          url: 'https://code.visualstudio.com/',                                       icon: '💻' },
+              { name: 'Node.js & npm',      tag: 'Runtime',                 desc: 'JavaScript runtime and package manager.',           url: 'https://nodejs.org/',                                                  icon: '🟢' },
+              { name: 'Git & GitHub',       tag: 'Version Control',         desc: 'Version control and collaboration platform.',       url: 'https://github.com/',                                                  icon: '🌿' },
+              { name: 'React DevTools',     tag: 'Debugging',               desc: 'Browser extension for debugging React apps.',       url: 'https://chromewebstore.google.com/',                                   icon: '⚛️' },
+              { name: 'Postman',            tag: 'API Testing',             desc: 'API development and testing tool.',                 url: 'https://www.postman.com/downloads/',                                   icon: '📮' },
+              { name: 'MongoDB Compass',    tag: 'Database',                desc: 'GUI for MongoDB database management.',              url: 'https://www.mongodb.com/products/tools/compass',                       icon: '🍃' },
+              { name: 'Figma',              tag: 'Design',                  desc: 'Design and prototyping tool.',                      url: 'https://www.figma.com/',                                               icon: '🎨' },
+              { name: 'Chrome DevTools',    tag: 'Debugging',               desc: 'Built-in browser debugging tools.',                 url: 'https://developer.chrome.com/docs/devtools',                           icon: '🧪' }
+            ],
+            textbooksRequired: [
+              {
+                icon: '📘',
+                title: 'Eloquent JavaScript',
+                subtitle: 'Marijn Haverbeke • 3rd Edition',
+                tags: ['Required', 'Free Access', 'Digital'],
+                description: 'A modern introduction to programming with JavaScript.',
+                isbn: '978-1593279509',
+                link: { label: 'Read Online (Free)', url: 'https://eloquentjavascript.net/' }
+              },
+              {
+                icon: '📗',
+                title: 'Learning React',
+                subtitle: 'Alex Banks, Eve Porcello • 2nd Edition',
+                tags: ['Required', 'Digital/Print'],
+                description: 'Modern patterns for developing React applications.',
+                isbn: '978-1492051718',
+                link: { label: 'View on O’Reilly', url: 'https://www.oreilly.com/library/view/learning-react-2nd/9781492051718/' }
+              },
+              {
+                icon: '📕',
+                title: 'Fullstack React',
+                subtitle: 'Anthony Accomazzo et al. • 2023 Edition',
+                tags: ['Required', 'Digital/Print'],
+                description: 'A complete guide to ReactJS and related tooling.',
+                isbn: '978-0991344628',
+                link: { label: 'Access Textbook', url: 'https://www.fullstackreact.com/' }
+              }
+            ],
+            textbooksRecommended: [
+              {
+                icon: '📙',
+                title: 'You Don’t Know JS Yet',
+                subtitle: 'Kyle Simpson',
+                tags: ['Optional', 'Free Online'],
+                description: 'A deep dive into core JavaScript concepts.',
+                isbn: '',
+                link: { label: 'Read on GitHub', url: 'https://github.com/getify/You-Dont-Know-JS' }
+              }
+            ]
+          },
+
+          2: {
+            id: 2,
+            code: 'CS 350',
+            title: 'Data Structures & Algorithms',
+            instructorName: 'Prof. Michael Zhang',
+            schedule: 'Tue & Thu, 2:00 PM – 3:30 PM',
+            location: 'Room 210, CS Building',
+            officeHours: 'Wed, 1:00 PM – 3:00 PM',
+            pinned: [1, 2],
+            announcements: [
+              {
+                id: 1,
+                title: 'Welcome to Data Structures & Algorithms',
+                body: 'Please read Chapter 1 and install a Java or C++ IDE before our first class.',
+                priority: 'high',
+                date: 'Sept 1, 2025',
+                time: '10:00 AM'
+              },
+              {
+                id: 2,
+                title: 'First Coding Lab Posted',
+                body: 'Lab 1 on arrays and linked lists has been posted. It is due Sept 18.',
+                priority: 'high',
+                date: 'Sept 8, 2025',
+                time: '4:00 PM'
+              }
+            ],
+            syllabus: {
+              description: 'This course introduces fundamental and advanced data structures and algorithms with a focus on time and space complexity, implementation, and problem solving.',
+              objectives: [
+                'Analyze algorithm performance using Big-O notation.',
+                'Implement core data structures: arrays, lists, stacks, queues, trees, heaps, and hash tables.',
+                'Work with graphs and graph algorithms (BFS, DFS, shortest paths).',
+                'Design and compare sorting and searching algorithms.',
+                'Apply data structures and algorithms to real-world problems.'
+              ],
+              grading: [
+                { label: 'Programming Assignments', weight: 30 },
+                { label: 'Labs & Quizzes',          weight: 20 },
+                { label: 'Midterm Exam',            weight: 20 },
+                { label: 'Final Exam',              weight: 30 }
+              ],
+              instructor: {
+                name: 'Prof. Michael Zhang',
+                email: 'michael.zhang@university.edu',
+                officeHours: 'Wed, 1:00 PM – 3:00 PM'
+              }
+            },
+            slides: [
+              { title: 'Week 1: Algorithm Analysis',          pages: '40 pages', date: 'Uploaded Sept 3, 2025',  size: '2.1 MB', url: '/files/dsa-week1-analysis.pdf' },
+              { title: 'Week 2: Arrays & Linked Lists',       pages: '48 pages', date: 'Uploaded Sept 10, 2025', size: '2.6 MB', url: '/files/dsa-week2-lists.pdf' },
+              { title: 'Week 3: Stacks & Queues',             pages: '45 pages', date: 'Uploaded Sept 17, 2025', size: '2.4 MB', url: '/files/dsa-week3-stacks-queues.pdf' },
+              { title: 'Week 4: Trees & Binary Search Trees', pages: '55 pages', date: 'Uploaded Sept 24, 2025', size: '3.0 MB', url: '/files/dsa-week4-trees.pdf' },
+              { title: 'Week 5: Heaps & Priority Queues',     pages: '50 pages', date: 'Uploaded Oct 1, 2025',   size: '2.8 MB', url: '/files/dsa-week5-heaps.pdf' },
+              { title: 'Week 6: Hash Tables',                 pages: '52 pages', date: 'Uploaded Oct 8, 2025',   size: '2.9 MB', url: '/files/dsa-week6-hashtables.pdf' },
+              { title: 'Week 7: Graphs & Traversals',         pages: '60 pages', date: 'Uploaded Oct 15, 2025',  size: '3.4 MB', url: '/files/dsa-week7-graphs.pdf' }
+            ],
+            materials: [
+              { title: 'Course Syllabus',        type: 'PDF',  meta: '210 KB',   size: '210 KB',  date: 'Added Sept 1, 2025',  download: true,  isExternal: false, url: '/files/dsa-syllabus.pdf' },
+              { title: 'Lab Guidelines',         type: 'PDF',  meta: '190 KB',   size: '190 KB',  date: 'Added Sept 2, 2025',  download: true,  isExternal: false, url: '/files/dsa-lab-guidelines.pdf' },
+              { title: 'Sample Exam Questions',  type: 'PDF',  meta: '300 KB',   size: '300 KB',  date: 'Added Oct 5, 2025',   download: true,  isExternal: false, url: '/files/dsa-sample-exam.pdf' },
+              { title: 'LeetCode Practice Set',  type: 'LINK', meta: 'External', size: '',        date: 'Added Sept 10, 2025', download: false, isExternal: true,  url: 'https://leetcode.com/' },
+              { title: 'Complexity Cheat Sheet', type: 'PDF',  meta: '120 KB',   size: '120 KB',  date: 'Added Sept 18, 2025', download: true,  isExternal: false, url: '/files/dsa-complexity-sheet.pdf' },
+              { title: 'Office Hours Zoom Link', type: 'LINK', meta: 'Zoom',     size: '',        date: 'Added Sept 1, 2025',  download: false, isExternal: true,  url: 'https://zoom.us/' }
+            ],
+            datesUpcoming: [
+              { title: 'Lab 2: Linked Lists',              kind: 'assignment', date: 'Oct 20, 2025', time: '11:59 PM',            location: '',   points: '40'  },
+              { title: 'Quiz 3: Trees',                    kind: 'exam',       date: 'Oct 27, 2025', time: '2:00 PM',             location: '',   points: '20'  },
+              { title: 'Project: Pathfinding Visualizer',  kind: 'assignment', date: 'Nov 10, 2025', time: '11:59 PM',            location: '',   points: '120' },
+              { title: 'Final Exam',                       kind: 'exam',       date: 'Dec 15, 2025', time: '9:00 AM – 12:00 PM',  location: '',   points: '200' }
+            ],
+            timeline: [
+              { title: 'Lab 1: Arrays',              status: 'Completed', kind: 'assignment', date: 'Sept 12, 2025', time: '11:59 PM', points: '30' },
+              { title: 'Quiz 1: Algorithm Analysis', status: 'Completed', kind: 'exam',       date: 'Sept 19, 2025', time: '2:00 PM',  points: '15' },
+              { title: 'Quiz 2: Lists & Queues',     status: 'Completed', kind: 'exam',       date: 'Sept 26, 2025', time: '2:00 PM',  points: '15' }
+            ],
+            tools: [
+              { name: 'Visual Studio Code', tag: 'IDE',            desc: 'Lightweight editor for C++/Java coding.',       url: 'https://code.visualstudio.com/', icon: '💻' },
+              { name: 'Java JDK',          tag: 'Runtime',        desc: 'Java development kit for algorithm labs.',      url: 'https://www.oracle.com/java/',   icon: '☕' },
+              { name: 'Git & GitHub',      tag: 'Version Control', desc: 'Submit and version your lab code.',            url: 'https://github.com/',            icon: '🌿' },
+              { name: 'LeetCode',          tag: 'Practice',       desc: 'Online platform to practice algorithm problems.', url: 'https://leetcode.com/',         icon: '🧩' },
+              { name: 'Replit',            tag: 'Online IDE',     desc: 'In-browser coding environment.',                url: 'https://replit.com/',            icon: '🌐' },
+              { name: 'Jupyter Notebook',  tag: 'Exploration',    desc: 'Experiment with Python implementations.',       url: 'https://jupyter.org/',           icon: '📓' }
+            ],
+            textbooksRequired: [
+              {
+                icon: '📘',
+                title: 'Introduction to Algorithms',
+                subtitle: 'Cormen, Leiserson, Rivest & Stein • 3rd Edition',
+                tags: ['Required', 'Reference'],
+                description: 'The standard reference for fundamental algorithms and data structures.',
+                isbn: '978-0262033848',
+                link: { label: 'View on Publisher', url: 'https://mitpress.mit.edu/9780262033848/' }
+              },
+              {
+                icon: '📗',
+                title: 'Data Structures & Algorithm Analysis in C++',
+                subtitle: 'Mark A. Weiss • 4th Edition',
+                tags: ['Required', 'Digital/Print'],
+                description: 'Practical implementation-focused coverage of data structures.',
+                isbn: '978-0132847377',
+                link: { label: 'View Details', url: 'https://www.pearson.com/' }
+              }
+            ],
+            textbooksRecommended: [
+              {
+                icon: '📙',
+                title: 'Algorithms',
+                subtitle: 'Dasgupta, Papadimitriou, Vazirani',
+                tags: ['Optional'],
+                description: 'Concise and intuitive explanations of core algorithms.',
+                isbn: '978-0073523408',
+                link: { label: 'More Info', url: 'https://www.mheducation.com/' }
+              }
+            ]
+          },
+
+          3: {
+            id: 3,
+            code: 'MATH 201',
+            title: 'Linear Algebra',
+            instructorName: 'Dr. Sarah Johnson',
+            schedule: 'Mon, Wed & Fri, 11:00 AM – 12:00 PM',
+            location: 'Room 120, Math Building',
+            officeHours: 'Mon, 2:00 PM – 4:00 PM',
+            pinned: [1],
+            announcements: [
+              {
+                id: 1,
+                title: 'Welcome to Linear Algebra',
+                body: 'Please bring a scientific calculator and print the first page of the formula sheet for Week 1.',
+                priority: 'high',
+                date: 'Sept 1, 2025',
+                time: '8:30 AM'
+              },
+              {
+                id: 2,
+                title: 'Problem Session Added',
+                body: 'Optional problem-solving session every Thursday 4–5 PM in Room 118.',
+                priority: 'medium',
+                date: 'Sept 10, 2025',
+                time: '3:00 PM'
+              }
+            ],
+            syllabus: {
+              description: 'An introduction to linear algebra with emphasis on matrices, vector spaces, linear transformations, and eigenvalues/eigenvectors.',
+              objectives: [
+                'Solve systems of linear equations using matrix methods.',
+                'Understand vector spaces, subspaces, bases, and dimension.',
+                'Work with linear transformations and matrix representations.',
+                'Compute eigenvalues and eigenvectors and diagonalize matrices.',
+                'Apply linear algebra concepts to geometry and data science.'
+              ],
+              grading: [
+                { label: 'Homework',      weight: 30 },
+                { label: 'Quizzes',       weight: 10 },
+                { label: 'Midterm Exam',  weight: 25 },
+                { label: 'Final Exam',    weight: 35 }
+              ],
+              instructor: {
+                name: 'Dr. Sarah Johnson',
+                email: 'sarah.johnson@university.edu',
+                officeHours: 'Mon, 2:00 PM – 4:00 PM'
+              }
+            },
+            slides: [
+              { title: 'Week 1: Systems of Linear Equations', pages: '38 pages', date: 'Uploaded Sept 2, 2025',  size: '1.9 MB', url: '/files/la-week1-systems.pdf' },
+              { title: 'Week 2: Matrix Algebra',              pages: '42 pages', date: 'Uploaded Sept 9, 2025',  size: '2.1 MB', url: '/files/la-week2-matrices.pdf' },
+              { title: 'Week 3: Determinants',                pages: '35 pages', date: 'Uploaded Sept 16, 2025', size: '1.7 MB', url: '/files/la-week3-determinants.pdf' },
+              { title: 'Week 4: Vector Spaces',               pages: '47 pages', date: 'Uploaded Sept 23, 2025', size: '2.5 MB', url: '/files/la-week4-vector-spaces.pdf' },
+              { title: 'Week 5: Eigenvalues & Eigenvectors',  pages: '50 pages', date: 'Uploaded Sept 30, 2025', size: '2.6 MB', url: '/files/la-week5-eigenvalues.pdf' }
+            ],
+            materials: [
+              { title: 'Course Syllabus',                     type: 'PDF',  meta: '200 KB',     size: '200 KB', date: 'Added Sept 1, 2025',  download: true,  isExternal: false, url: '/files/la-syllabus.pdf' },
+              { title: 'Formula Sheet (Midterm)',             type: 'PDF',  meta: '150 KB',     size: '150 KB', date: 'Added Sept 15, 2025', download: true,  isExternal: false, url: '/files/la-formula-midterm.pdf' },
+              { title: 'Recommended Problem Sets',            type: 'PDF',  meta: '10 pages',   size: '250 KB', date: 'Added Sept 20, 2025', download: true,  isExternal: false, url: '/files/la-extra-problems.pdf' },
+              { title: '3Blue1Brown Essence of Linear Algebra', type: 'LINK', meta: 'YouTube Playlist', size: '', date: 'Added Sept 5, 2025', download: false, isExternal: true,  url: 'https://www.youtube.com/playlist?list=PLZHQObOWTQDMsr9K-rj53DwVRMYO3t5Yr' },
+              { title: 'MATLAB Cheat Sheet',                  type: 'PDF',  meta: '2 pages',    size: '90 KB',  date: 'Added Sept 25, 2025', download: true,  isExternal: false, url: '/files/la-matlab-cheatsheet.pdf' }
+            ],
+            datesUpcoming: [
+              { title: 'Quiz 2: Matrix Algebra',           kind: 'exam',       date: 'Oct 18, 2025', time: '11:00 AM',             location: 'In class',        points: '20'  },
+              { title: 'Homework 4 Due',                  kind: 'assignment', date: 'Oct 22, 2025', time: '11:59 PM',             location: 'LMS submission',  points: '30'  },
+              { title: 'Midterm Exam',                    kind: 'exam',       date: 'Nov 3, 2025',  time: '11:00 AM – 12:00 PM', location: 'Room 120',        points: '100' },
+              { title: 'Final Exam',                      kind: 'exam',       date: 'Dec 17, 2025', time: '1:00 PM – 4:00 PM',   location: 'Exam Hall A',     points: '150' }
+            ],
+            timeline: [
+              { title: 'Homework 1: Systems of Equations', status: 'Completed', kind: 'assignment', date: 'Sept 10, 2025', time: '11:59 PM', points: '25' },
+              { title: 'Quiz 1: Row Reduction',           status: 'Completed', kind: 'exam',       date: 'Sept 17, 2025', time: '11:00 AM', points: '20' },
+              { title: 'Homework 2: Matrix Algebra',      status: 'Completed', kind: 'assignment', date: 'Sept 24, 2025', time: '11:59 PM', points: '25' }
+            ],
+            tools: [
+              { name: 'MATLAB or Octave',         tag: 'Computation',   desc: 'Matrix computations and visualization.',      url: 'https://www.mathworks.com/products/matlab.html', icon: '📊' },
+              { name: 'Python (NumPy)',           tag: 'Computation',   desc: 'Python library for numerical linear algebra.', url: 'https://numpy.org/',                          icon: '🐍' },
+              { name: 'Desmos Matrix Calculator', tag: 'Visualization', desc: 'Quick matrix operations in the browser.',     url: 'https://www.desmos.com/matrix',                icon: '📈' },
+              { name: 'Overleaf',                 tag: 'LaTeX',         desc: 'Typeset your linear algebra solutions.',       url: 'https://www.overleaf.com/',                     icon: '📄' }
+            ],
+            textbooksRequired: [
+              {
+                icon: '📘',
+                title: 'Linear Algebra and Its Applications',
+                subtitle: 'David C. Lay et al. • 5th Edition',
+                tags: ['Required', 'Digital/Print'],
+                description: 'Standard undergraduate text for linear algebra.',
+                isbn: '978-0321982384',
+                link: { label: 'View on Publisher', url: 'https://www.pearson.com/' }
+              },
+              {
+                icon: '📗',
+                title: 'Introduction to Linear Algebra',
+                subtitle: 'Gilbert Strang • 5th Edition',
+                tags: ['Required'],
+                description: 'Concept-driven approach with many examples.',
+                isbn: '978-0980232776',
+                link: { label: 'MIT Resources', url: 'https://math.mit.edu/~gs/linearalgebra/' }
+              }
+            ],
+            textbooksRecommended: [
+              {
+                icon: '📙',
+                title: 'No Bullshit Guide to Linear Algebra',
+                subtitle: 'Ivan Savov',
+                tags: ['Optional'],
+                description: 'Intuitive explanations and lots of worked examples.',
+                isbn: '978-0992001001',
+                link: { label: 'More Info', url: 'https://minireference.com/linear_algebra_book/' }
+              }
+            ]
+          }
+        },
+
+        // active tab and current course for the detail page
+        courseDetailTab: 'syllabus',
+        courseDetail: {},
+
+        // Resource modal state (fake PDF viewer)
+        resourceModalOpen: false,
+        resourceModal: {
+          title: '',
+          type: '',
+          pages: '',
+          date: '',
+          size: '',
+          url: ''
+        },
+
+        openResource(payload) {
+          this.resourceModal = payload;
+          this.resourceModalOpen = true;
+        },
+        closeResource() {
+          this.resourceModalOpen = false;
+        },
+        openCourse(id) {
+          if (this.courseDetails[id]) {
+            this.courseDetail = this.courseDetails[id];
+          } else {
+            const firstKey = Object.keys(this.courseDetails)[0];
+            this.courseDetail = this.courseDetails[firstKey];
+          }
+          this.courseDetailTab = 'syllabus';
+          this.page = 'course';
+        },
+
+        /* ===== AI Assistant (student) ===== */
+        aiTab: 'chat',
+        faq: [
+          'How do I submit assignments?','When are grades posted?','How can I contact my instructor?',
+          'What’s the late submission policy?','How do I access lecture recordings?'
+        ],
+        chat: {
+          input:'',
+          messages:[
+            {
+              id:1,
+              role:'assistant',
+              text:"Hello! I'm your AI Teaching Assistant. I can help you understand course content, summarize lectures, generate quizzes, and create personalized study plans. How can I assist you today?"
+            }
+          ]
+        },
+        sendChat(){
+          const text=this.chat.input.trim();
+          if(!text) return;
+          this.chat.messages.push({id:Date.now(), role:'user', text});
+          this.chat.messages.push({
+            id:Date.now()+1,
+            role:'assistant',
+            text:'Thanks for your question! I’m currently a prototype inside this LMS demo, so I can’t access real course content yet. But in the full version, I would reference your syllabus, recent lectures, and assignments for a tailored answer. For now, try specifying your course code (e.g., “CS 401”) for a more targeted response.'
+          });
+          this.chat.input='';
+          this.$nextTick(()=>{
+            const el=document.getElementById('chatScroll');
+            if(el) el.scrollTop = el.scrollHeight;
+          });
+        },
+
+        /* ===== Study helpers (sample; optional) ===== */
+        courses: [
+          {code:'CS 401', lectures:[
+            {id:'cs401-1', title:'Intro to Modern Web'},
+            {id:'cs401-2', title:'React with Hooks'},
+            {id:'cs401-3', title:'Component Lifecycle'},
+            {id:'cs401-4', title:'Advanced Patterns'},
+            {id:'cs401-5', title:'Performance Optimization'}
+          ]},
+          {code:'CS 350', lectures:[
+            {id:'cs350-1', title:'Algorithm Analysis'},
+            {id:'cs350-2', title:'Sorting & Searching'},
+            {id:'cs350-3', title:'Trees & Graphs'}
+          ]},
+          {code:'MATH 201', lectures:[
+            {id:'math201-1', title:'Systems of Equations'},
+            {id:'math201-2', title:'Matrix Algebra'},
+            {id:'math201-3', title:'Vector Spaces'}
+          ]}
+        ],
+        lecturesByCourse:[
+          {code:'CS 401', lectures:[
+            {id:'cs401-1', title:'Intro to Modern Web'},
+            {id:'cs401-2', title:'React with Hooks'},
+            {id:'cs401-3', title:'Component Lifecycle'},
+            {id:'cs401-4', title:'Advanced Patterns'},
+            {id:'cs401-5', title:'Performance Optimization'}
+          ]},
+          {code:'CS 350', lectures:[
+            {id:'cs350-1', title:'Algorithm Analysis'},
+            {id:'cs350-2', title:'Sorting & Searching'},
+            {id:'cs350-3', title:'Trees & Graphs'}
+          ]},
+          {code:'MATH 201', lectures:[
+            {id:'math201-1', title:'Systems of Equations'},
+            {id:'math201-2', title:'Matrix Algebra'},
+            {id:'math201-3', title:'Vector Spaces'}
+          ]}
+        ],
+
+        summary: { course:'', lectures:[] },
+        summaryOut: [],
+        generateSummary(){
+          if(!this.summary.course || !this.summary.lectures.length){
+            this.summaryOut = [];
+            return;
+          }
+          const lecNames = this.summary.lectures
+            .map(lid => {
+              const course = this.lecturesByCourse.find(c=>c.code===this.summary.course);
+              const lec = course ? course.lectures.find(l=>l.id===lid) : null;
+              return lec ? lec.title : 'Selected Lecture';
+            });
+          this.summaryOut = [
+            {
+              title:'Key Topics',
+              bullets: lecNames.map(name => `Core ideas from “${name}”.`)
+            },
+            {
+              title:'Suggested Practice',
+              bullets: [
+                'Write a short summary of each lecture in your own words.',
+                'Create 3–5 practice questions per topic.',
+                'Review related textbook sections and examples.'
+              ]
+            }
+          ];
+        },
+
+        quiz: { course:'', lectures:[] },
+        quizOut: [],
+        generateQuiz(){
+          this.quizOut = this.quiz.lectures.map((lid,idx) => {
+            const course = this.lecturesByCourse.find(c=>c.code===this.quiz.course);
+            const lec = course ? course.lectures.find(l=>l.id===lid) : null;
+            return {
+              q: `What is a key concept from “${lec ? lec.title : 'Selected Lecture'}”?`,
+              options:['Basic principles','Advanced techniques','Practical applications','All of the above'],
+              answer:'All of the above'
+            };
+          });
+        },
+
+        /* ===== Study Plan ===== */
+        plan:{goals:'', pace:''},
+        planOut:[],
+        generatePlan(){
+          const g=this.plan.goals || 'Improve overall performance across courses';
+          const p=this.plan.pace || '10–12 hrs/week';
+          this.planOut = [
+            {
+              title:'Weekly Structure',
+              steps:[
+                'Mon/Wed/Fri: 60–90 min focused problem-solving',
+                'Tue/Thu: Review notes + summarize key ideas',
+                'Weekend: 2–3 hrs project or past papers'
+              ]
+            },
+            {
+              title:'Focus Areas',
+              steps:[
+                `Goals: ${g}`,
+                'Prioritize weak topics from latest quizzes/assignments',
+                'Schedule checkpoints every Sunday evening'
+              ]
+            },
+            {
+              title:'Time Allocation',
+              steps:[
+                `Planned study time: ${p}`,
+                'Split time evenly across active courses unless deadlines require rebalancing'
+              ]
+            }
+          ];
+        },
+
+        /* ===== Profile editor helpers ===== */
+        isEditingProfile: false,
+        profileDraft: {},
+        editProfile(){
+          this.profileDraft = structuredClone(this.profile);
+          this.isEditingProfile = true;
+        },
+        cancelProfile(){
+          this.profileDraft = {};
+          this.isEditingProfile = false;
+        },
+        saveProfileDraft(){
+          this.profile = structuredClone(this.profileDraft);
+          this.saveProfile();
+          this.isEditingProfile = false;
+        },
+
+        /* ===== Settings page example state ===== */
+        settings: {
+          darkMode:false,
+          emailUpdates:true,
+          smsAlerts:false
+        },
+
+        /* ===== Mount / init ===== */
+        init(){
+          this.initMiniCalendar();
+          // If you want default course detail, preselect first:
+          const firstKey = Object.keys(this.courseDetails)[0];
+          if(firstKey){
+            this.courseDetail = this.courseDetails[firstKey];
+          }
+        },
+
+        /* ===== Small helpers ===== */
+        initials(fn, ln){
+          const a = (fn || '').trim()[0] || '';
+          const b = (ln || '').trim()[0] || '';
+          return (a + b || 'SJ').toUpperCase();
+        }
+      }
+    }
+
+  </script>
+</body>
+</html>
