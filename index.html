@@ -37,13 +37,13 @@
   </script>
   <style>[x-cloak]{display:none!important}</style>
 </head>
-<body class="bg-sand-50 text-slate-800 selection:bg-rust-200/60">
+<body class="bg-sand-50 text-slate-800 selection:bg-rust-200/60 md:overflow-hidden">
 
-  <div class="min-h-dvh flex">
+  <div class="h-dvh flex">
 
     <!-- Sidebar -->
     <aside
-      class="w-64 bg-white border-r border-sand-200/70 fixed inset-y-0 left-0 z-30 md:static md:translate-x-0 transform transition-transform duration-200"
+      class="w-64 bg-white border-r border-sand-200/70 fixed inset-y-0 left-0 z-30 transform transition-transform duration-200 flex flex-col"
       :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
 
       <!-- Brand -->
@@ -58,7 +58,7 @@
       </div>
 
       <!-- Nav (icons + labels) -->
-      <nav class="p-2 space-y-1 text-sm flex-1 overflow-y-auto">
+      <nav class="p-2 space-y-1 text-sm flex-1">
         <template x-for="item in [
           {k:'dashboard',label:'Dashboard',  icon:'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l-2 2m-2-2v10a1 1 0 01-1 1h-3m-3 0V9a1 1 0 011-1h6a1 1 0 011 1v10a1 1 0 01-1 1h-3'},
           {k:'courses',  label:'Courses',    icon:'M4 6h16M4 12h16m-7 6h7'},
@@ -110,36 +110,28 @@
         </button>
       </div>
 
-
-      <!-- Separator -->
-      <div class="border-t border-sand-200/80 pt-4 mt-2">
-
-        <!-- Bottom profile (non-clickable) -->
-          <div class="w-full flex items-center gap-3 px-2.5 py-2.5">
-            <div class="flex items-center gap-3">
-              <div class="h-9 w-9 rounded-2xl bg-sand-100 flex items-center justify-center">
-                <!-- keep a cute static avatar emoji -->
-                <span x-text="(profile.firstName||'A').slice(0,1)"></span>
-              </div>
-              <div>
-                <!-- name from profile -->
-                <div class="text-xs font-medium text-slate-900"
-                    x-text="(profile.firstName || '') + ' ' + (profile.lastName || '')">
-                </div>
-                <!-- email from profile -->
-                <div class="text-[11px] text-slate-500"
-                    x-text="profile.email || ''">
-                </div>
-              </div>
+      <!-- Bottom user chip -->
+      <div class="mt-auto border-t border-sand-200/80 px-3 py-4">
+        <div class="flex items-center gap-3">
+          <div class="h-9 w-9 rounded-2xl bg-sand-100 flex items-center justify-center">
+            <span x-text="(profile.firstName||'A').slice(0,1)"></span>
+          </div>
+          <div>
+            <div class="text-xs font-medium text-slate-900"
+                x-text="(profile.firstName || '') + ' ' + (profile.lastName || '')">
+            </div>
+            <div class="text-[11px] text-slate-500"
+                x-text="profile.email || ''">
             </div>
           </div>
-        </div>   
-    
+        </div>
+      </div>
+   
     </aside>
 
 
     <!-- Main -->
-    <main class="flex-1 md:ml-0 ml-0 md:relative md:left-0 left-0">
+    <main class="flex-1 ml-0 md:ml-64 md:h-dvh md:overflow-y-auto">
       <!-- Mobile top bar -->
       <div class="md:hidden sticky top-0 z-20 bg-white/80 backdrop-blur border-b border-sand-200/70">
         <div class="px-4 py-3 flex items-center justify-between">
