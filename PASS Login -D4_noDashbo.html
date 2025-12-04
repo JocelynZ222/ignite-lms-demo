@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en" x-data="app()" :class="{'overflow-hidden': sidebarOpen, 'h-full': !isLoggedIn}">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ignite LMS - Login</title>
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            rust: {
+              50:'#fdf4f2',100:'#fde8e4',200:'#f8d3cc',300:'#efb7ad',400:'#e19080',
+              500:'#cf6f5b',600:'#b35146',700:'#8f3c35',800:'#73332f',900:'#5f2d2b'
+            },
+            sand: {
+              50:'#faf7f3',100:'#f4efe9',200:'#ebe2d8',300:'#dfd1c1',400:'#cbb7a1',
+              500:'#b7a089',600:'#9a836c',700:'#7c6957',800:'#645448',900:'#52463c'
+            }
+          },
+          boxShadow: {
+            card: '0 1px 2px rgba(15,23,42,.05), 0 12px 24px -8px rgba(15,23,42,.10)'
+          },
+          borderRadius: {
+            xl2: '1.25rem'
+          }
+        }
+      }
+    }
+
+    window.app = function() {
+      return {
+        // --- AUTH STATE & FUNCTIONS ---
+        isLoggedIn: false, // Controls display: false for Login, true for Dashboard
+        showLogin: true, // Controls display: true for Login tab, false for Sign-up tab
+        showResetPassword: false, // NEW: Controls the Reset Password View
+        registeredUser: {
+          username: '',
+          password: ''
+        },
+        resetCredentials: { // NEW: State for Reset Password form
+          username: '',
+          newPassword: '',
+          confirmPassword: ''
+        },
+        loginCredentials: {
+          username: '',
+          password: ''
+        },
+        authError: '',
+        showSignupPassword: false,
+        showLoginPassword: false,
+        showNewPassword: false, // NEW: Toggle for New Password field
+        showConfirmPassword: false, // NEW: Toggle for Confirm Password field
+
+        validateSignup() {
+          this.authError = '';
+          if (this.registeredUser.username.length < 3) {
+            this.authError = 'Username must have at least 3 characters.';
+            return false;
+          }
+          if (this.registeredUser.password.length < 6) {
+            this.authError = 'Password must have at least 6 characters.';
+            return false;
+          }
+          return true;
+        },
+
+        handleSignup() {
+          if (!this.validateSignup()) return;
+
+          // For this example, we just switch to the login view and confirm registration
+          this.showLogin = true;
+          this.authError = 'Registration successful! Please log in now.';
+          this.loginCredentials.username = this.registeredUser.username;
+          this.loginCredentials.password = '';
+        },
+
+        handleLogin() {
+          this.authError = '';
+          if (this.loginCredentials.username === this.registeredUser.username &&
+            this.loginCredentials.password === this.registeredUser.password &&
+            this.registeredUser.username.length > 0) {
+            // Successful Login
+            this.isLoggedIn = true;
+            this.page = 'dashboard';
+            document.title = 'Ignite LMS - Dashboard';
+            // Optional: Clear credentials after successful login
+            this.loginCredentials.username = '';
+            this.loginCredentials.password = '';
+            this.authError = '';
+          } else {
+            // Failed Login
+            this.authError = 'Invalid username or password. Please try again.';
+          }
+        },
+
+        forgotPassword() {
+          this.showResetPassword = true; // Show the new reset form
+          this.authError = '';
+        },
+
+        handlePasswordReset() {
+          this.authError = '';
+          if (this.resetCredentials.newPassword !== this.resetCredentials.confirmPassword) {
+            this.authError = 'New password and confirm password do not match.';
+            return;
+          }
+          if (this.resetCredentials.newPassword.length < 6) {
+            this.authError = 'New password must have at least 6 characters.';
+            return;
+          }
+
+          // For this example, update the registered password and switch to login
+          this.registeredUser.password = this.resetCredentials.newPassword;
+          this.showResetPassword = false;
+          this.showLogin = true;
+          this.authError = 'Password successfully reset. Please log in.';
+          
+          // Clear reset fields
+          this.resetCredentials.username = '';
+          this.resetCredentials.newPassword = '';
+          this.resetCredentials.confirmPassword = '';
+        },
+        sidebarOpen: false,   
+      }
+    }
+        // --- END AUTH STATE & FUNCTIONS ---
+  </script>
+
+          <!-- ================= LOGIN PAGE ================= -->
+  <style>[x-cloak]{display:none!important}</style>
+</head>
+<body class="bg-sand-50 text-slate-800 selection:bg-rust-200/60" :class="{'h-full': !isLoggedIn, 'flex items-center justify-center': !isLoggedIn}">
+
+  <template x-if="!isLoggedIn">
+    <div class="max-w-md w-full mx-auto p-8 bg-white rounded-xl2 shadow-card border border-sand-200/70" x-data="{ tabs: ['Login', 'Sign-up'] }">
+      <div class="text-center mb-6">
+        <div class="inline-flex items-center gap-2">
+          <div class="h-10 w-10 rounded-full bg-rust-500/90 flex items-center justify-center shadow-card">
+            <span class="text-white font-semibold">I</span>
+          </div>
+          <h1 class="text-3xl font-bold text-slate-900">Ignite</h1>
+        </div>
+        <p class="text-sm text-slate-500 mt-2">Welcome to your learning platform.</p>
+      </div>
+
+      <div x-show="!showResetPassword" class="flex border-b border-sand-200 mb-6">
+        <button
+          @click="showLogin = true; authError = ''"
+          :class="showLogin ? 'border-rust-500 text-rust-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'"
+          class="flex-1 py-2 text-center border-b-2 transition duration-150">
+          Login
+        </button>
+        <button
+          @click="showLogin = false; authError = ''"
+          :class="!showLogin ? 'border-rust-500 text-rust-600 font-semibold' : 'border-transparent text-slate-500 hover:text-slate-700'"
+          class="flex-1 py-2 text-center border-b-2 transition duration-150">
+          Sign-up
+        </button>
+      </div>
+
+      <div x-show="authError" :class="authError.includes('successful') ? 'bg-emerald-100 border-emerald-300 text-emerald-700' : 'bg-red-100 border-red-300 text-red-700'" class="p-3 mb-4 rounded-lg border text-sm" x-text="authError" x-cloak></div>
+      
+      <template x-if="showResetPassword">
+        <div>
+          <h2 class="text-2xl font-bold text-slate-900 text-center mb-2">Reset Password</h2>
+          <p class="text-sm text-slate-500 text-center mb-6">Enter your username and new password</p>
+          <form @submit.prevent="handlePasswordReset" class="space-y-4">
+            <div>
+              <label for="reset-username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+              <input type="text" id="reset-username" x-model="resetCredentials.username" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="Enter your username">
+            </div>
+
+            <div class="relative">
+              <label for="new-password" class="block text-sm font-medium text-slate-700 mb-1">New Password</label>
+              <input :type="showNewPassword ? 'text' : 'password'" id="new-password" x-model="resetCredentials.newPassword" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="Enter new password">
+              <button type="button" @click="showNewPassword = !showNewPassword" class="absolute inset-y-0 right-0 top-2 pr-3 flex items-center text-sm leading-5 text-slate-500">
+                <svg x-show="!showNewPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <svg x-show="showNewPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.41 0 2.766.36 3.96 1.05M12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M4.293 4.293L19.707 19.707"/>
+                </svg>
+              </button>
+              <p class="text-xs text-slate-500 mt-1">Password must have at least 6 characters.</p>
+            </div>
+
+            <div class="relative">
+              <label for="confirm-password" class="block text-sm font-medium text-slate-700 mb-1">Confirm Password</label>
+              <input :type="showConfirmPassword ? 'text' : 'password'" id="confirm-password" x-model="resetCredentials.confirmPassword" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="Confirm your password">
+              <button type="button" @click="showConfirmPassword = !showConfirmPassword" class="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-sm leading-5 text-slate-500">
+                <svg x-show="!showConfirmPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                <svg x-show="showConfirmPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.41 0 2.766.36 3.96 1.05M12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M4.293 4.293L19.707 19.707"/>
+                </svg>
+              </button>
+            </div>
+
+            <button type="submit" class="w-full py-2 px-4 rounded-lg bg-rust-500/90 text-white font-semibold hover:bg-rust-600 transition">Reset Password</button>
+            
+            <div class="text-center pt-2">
+                Already have an account? <a href="#" @click.prevent="showResetPassword = false; showLogin = true; authError = ''" class="text-rust-600 hover:text-rust-800 font-medium">Log in</a>
+            </div>
+          </form>
+        </div>
+      </template>
+
+      <form x-show="showLogin && !showResetPassword" @submit.prevent="handleLogin" class="space-y-4" x-cloak>
+        <div>
+          <label for="login-username" class="block text-sm font-medium text-slate-700 mb-1">Username</label>
+          <input type="text" id="login-username" x-model="loginCredentials.username" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="Enter your username">
+        </div>
+
+        <div class="relative">
+          <label for="login-password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+          <input :type="showLoginPassword ? 'text' : 'password'" id="login-password" x-model="loginCredentials.password" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="••••••••">
+          <button type="button" @click="showLoginPassword = !showLoginPassword" class="absolute inset-y-0 right-0 top-6 pr-3 flex items-center text-sm leading-5 text-slate-500">
+            <svg x-show="!showLoginPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+            <svg x-show="showLoginPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.41 0 2.766.36 3.96 1.05M12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M4.293 4.293L19.707 19.707"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <a href="#" @click.prevent="forgotPassword" class="text-sm text-rust-600 hover:text-rust-800">Forgot your password?</a>
+        </div>
+
+        <button type="submit" class="w-full py-2 px-4 rounded-lg bg-rust-500/90 text-white font-semibold hover:bg-rust-600 transition">Log In</button>
+      </form>
+
+      <form x-show="!showLogin && !showResetPassword" @submit.prevent="handleSignup" class="space-y-4" x-cloak>
+        <div>
+          <label for="signup-username" class="block text-sm font-medium text-slate-700 mb-1">Create Username</label>
+          <input type="text" id="signup-username" x-model="registeredUser.username" :minlength="3" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="Minimum 3 characters">
+          <p class="text-xs text-slate-500 mt-1">Username must have at least 3 characters.</p>
+        </div>
+
+        <div class="relative">
+          <label for="signup-password" class="block text-sm font-medium text-slate-700 mb-1">Create Password</label>
+          <input :type="showSignupPassword ? 'text' : 'password'" id="signup-password" x-model="registeredUser.password" :minlength="6" required class="w-full px-4 py-2 border border-sand-300 rounded-lg focus:ring-rust-500 focus:border-rust-500" placeholder="••••••••">
+          <button type="button" @click="showSignupPassword = !showSignupPassword" class="absolute inset-y-0 right-0 **top-6** pr-3 flex items-center text-sm leading-5 text-slate-500">
+            <svg x-show="!showSignupPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+            </svg>
+            <svg x-show="showSignupPassword" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7 1.274-4.057 5.064-7 9.542-7 1.41 0 2.766.36 3.96 1.05M12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7a10.05 10.05 0 01-1.875-.175M4.293 4.293L19.707 19.707"/></svg>
+          </button>
+          <p class="text-xs text-slate-500 mt-1">Password must have at least 6 characters.</p>
+        </div>
+
+        <button type="submit" class="w-full py-2 px-4 rounded-lg bg-rust-500/90 text-white font-semibold hover:bg-rust-600 transition">Sign Up</button>
+      </form>
+    </div>
+  </template>
+
+
+  <template x-if="isLoggedIn">
+    <div class="min-h-dvh flex">
+
+      <aside
+        class="w-64 bg-white border-r border-sand-200/70 fixed inset-y-0 left-0 z-30 md:static md:translate-x-0 transform transition-transform duration-200"
+        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
+
+        <div class="px-5 pt-6 pb-4 flex items-center gap-3 border-b border-sand-200/70">
+          <div class="h-10 w-10 rounded-full bg-rust-500/90 flex items-center justify-center shadow-card">
+            <span class="text-white font-semibold">I</span>
+          </div>
+          <div>
+            <div class="text-slate-900 font-semibold">Ignite</div>
+            <div class="text-xs text-slate-500">Fall 2025</div>
+          </div>
+        </div>
+
+</body>
+            <!-- ================= END OF LOGIN PAGE ================= -->
+
+            <!-- ================= DASHBOARD TAB ================= -->
+        <!-- DASHBOARD (restored with calendar) -->
+        <!-- DASHBOARD -->
